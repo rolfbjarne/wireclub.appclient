@@ -10,7 +10,8 @@ let online () = async {
 }
 
 let session id = async {
-    ()
+    let! resp = Api.req ("privateChat/session/" + id) "post" Map.empty
+    return Api.toObject<SessionResponse> resp
 }
 
 let send receiver message = async {
