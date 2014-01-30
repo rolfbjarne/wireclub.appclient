@@ -49,14 +49,13 @@
     <Reference Include="FSharp.Core" />
     <Reference Include="Mono.Android" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Resources\Resource.designer.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AboutResources.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\values\Strings.xml" />
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.FSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Account.fs" />
+    <Compile Include="Api.fs" />
+    <Compile Include="App.fs" />
+    <Compile Include="Channel.fs" />
+    <Compile Include="Chat.fs" />
+    <Compile Include="PrivateChat.fs" />
+  </ItemGroup>
 </Project>
