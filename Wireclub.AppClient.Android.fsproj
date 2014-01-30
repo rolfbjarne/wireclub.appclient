@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -48,14 +48,27 @@
     <Reference Include="System.Core" />
     <Reference Include="FSharp.Core" />
     <Reference Include="Mono.Android" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>packages\Newtonsoft.Json.5.0.8\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>packages\protobuf-net.2.0.0.668\lib\portable-sl4+net40+wp7+windows8\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.FSharp.targets" />
   <ItemGroup>
-    <Compile Include="Account.fs" />
     <Compile Include="Api.fs" />
+    <Compile Include="Account.fs" />
     <Compile Include="App.fs" />
     <Compile Include="Channel.fs" />
     <Compile Include="Chat.fs" />
     <Compile Include="PrivateChat.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\NEXT\Wireclub.Boundary\Wireclub.Boundary.Android.fsproj">
+      <Project>{582752E5-FC75-4D58-BC9F-E4B0931C9E4E}</Project>
+      <Name>Wireclub.Boundary.Android</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

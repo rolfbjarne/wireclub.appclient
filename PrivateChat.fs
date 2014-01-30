@@ -8,5 +8,3 @@ let online () = async {
 let session id = async {
     ()
 }
-
-Async.RunSynchronously (online ())

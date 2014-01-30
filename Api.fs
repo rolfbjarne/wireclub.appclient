@@ -1,5 +1,6 @@
 ﻿module Api
 
+open System
 open System.Net
 open System.Net.Http
 open System.Collections.Generic
@@ -17,7 +18,7 @@ let baseUrl = "http://dev.wireclub.com"
 
 type ApiFailureType =
 | Timeout
-| Exception
+| Exception of System.Exception
 
 type ApiResult<'A> =
 | ApiOk of 'A
@@ -44,5 +45,5 @@ let req (url:string) (httpMethod:string) (data:Map<string,string>)  = async {
         let! resp = Async.AwaitTask (resp.Content.ReadAsStringAsync())
         return ApiOk resp
     with
-    | ex -> return ApiError (Exception, ex.ToString())
+    | ex -> return ApiError (Exception ex, ex.ToString())
 }
