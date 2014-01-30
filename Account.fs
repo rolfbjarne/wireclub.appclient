@@ -26,9 +26,3 @@ let home () = async {
 let test () = async {
     return! Api.req "test/csrf" "post" Map.empty
 }
-
-Async.RunSynchronously (login "braden" "notinthedictionary")
-
-Async.RunSynchronously (home ())
-
-Async.RunSynchronously (test ())
