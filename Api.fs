@@ -10,7 +10,6 @@ handler.CookieContainer <- cookies
 
 let client = new HttpClient(handler)
 client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "wireclub-app-android/1.0") |> ignore
-client.DefaultRequestHeaders.TryAddWithoutValidation("x-csrf", "....") |> ignore
 client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("application/json"))
 
 //let baseUrl = "http://www.wireclub.com"
