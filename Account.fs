@@ -10,13 +10,11 @@ let login username password = async {
                 "password", password
             ] |> Map.ofList)
     
-    match resp with
-    | Api.ApiOk content ->
-        let result = JsonConvert.DeserializeObject<Wireclub.Boundary.LoginResult>(content)
+    match Api.toObject<Wireclub.Boundary.LoginResult> resp with
+    | Api.ApiOk result ->
         Api.client.DefaultRequestHeaders.TryAddWithoutValidation("x-csrf-token", result.Csrf) |> ignore
         return Api.ApiOk result
-    | Api.ApiError (t, s) -> 
-        return Api.ApiError (t, s)
+    | resp -> return resp
 }
 
 let home () = async {

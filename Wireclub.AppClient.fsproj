@@ -51,6 +51,8 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
+    <None Include="Test/Driver.fsx" />
+    <None Include="Test/Protobuf.fsx" />
     <Compile Include="Api.fs" />
     <Compile Include="Account.fs" />
     <Compile Include="Channel.fs" />

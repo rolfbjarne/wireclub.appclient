@@ -3,10 +3,12 @@
 open System.Net
 open System.Net.Http
 open System.Collections.Generic
+open Newtonsoft.Json
 
 let cookies = new CookieContainer()
 let handler = new HttpClientHandler()
 handler.CookieContainer <- cookies
+handler.AllowAutoRedirect <- false
 
 let client = new HttpClient(handler)
 client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "wireclub-app-android/1.0") |> ignore
@@ -17,6 +19,7 @@ let baseUrl = "http://dev.wireclub.com"
 
 type ApiFailureType =
 | Timeout
+| HttpError of int
 | Exception
 
 type ApiResult<'A> =
@@ -38,11 +41,17 @@ let req (url:string) (httpMethod:string) (data:Map<string,string>)  = async {
         let! resp = Async.AwaitTask task
 
         printfn "HTTP:%s %s %i" httpMethod url (int resp.StatusCode)
+        
+        let! content = Async.AwaitTask (resp.Content.ReadAsStringAsync())
 
-        // TODO: HTTP Status
-
-        let! resp = Async.AwaitTask (resp.Content.ReadAsStringAsync())
-        return ApiOk resp
+        match int resp.StatusCode with
+        | 200 -> return ApiOk content
+        | status -> return ApiError (HttpError status, content)
     with
     | ex -> return ApiError (Exception, ex.ToString())
 }
+
+let toObject<'A> apiResult =
+    match apiResult with
+    | ApiOk content -> ApiOk (JsonConvert.DeserializeObject<'A>(content))
+    | ApiError (t, s) -> ApiError (t, s)

@@ -4,11 +4,11 @@
 #r "System.Runtime"
 #r "System.Collections"
 
-#r "./bin/debug/Newtonsoft.Json.dll"  
-#r "./bin/debug/Wireclub.Boundary.dll"
-#r "./bin/debug/Wireclub.AppClient.dll"  
+#r "../bin/debug/Newtonsoft.Json.dll"  
+#r "../bin/debug/Wireclub.Boundary.dll"
+#r "../bin/debug/Wireclub.AppClient.dll"  
 
-
+Async.RunSynchronously <| Account.login "braden" "notinthedictionary"
 
 open System
 open System.Collections.Concurrent
