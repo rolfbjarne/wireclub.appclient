@@ -20,7 +20,8 @@ open Wireclub.Boundary.Chat
 Async.RunSynchronously <| 
     async {
         let! _ = Account.login "unitman" "testtest"
-        ChannelClient.PrivateChatClient.init ()
+        let! _ = PrivateChat.initSession "AAAAAAAAAAAAAAAB0"
+        ()
     }
 
 Api.userHash
