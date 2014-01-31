@@ -6,13 +6,13 @@ open Newtonsoft.Json
 
 let login username password = async {
     let! resp = 
-        Api.req "account/doLogin" "post" (
+        Api.req<LoginResult> "account/doLogin" "post" (
             [
                 "username", username
                 "password", password
-            ] |> Map.ofList)
+            ])
     
-    match Api.toObject<LoginResult> resp with
+    match resp with
     | Api.ApiOk result ->
         Api.client.DefaultRequestHeaders.TryAddWithoutValidation("x-csrf-token", result.Csrf) |> ignore
         Api.userId <- result.Identity.Id
@@ -21,15 +21,11 @@ let login username password = async {
     | resp -> return resp
 }
 
-let home () = async {
-    return! Api.req "home" "get" Map.empty
-}
+let home () =
+    Api.req<string> "home" "get" []
 
-let test () = async {
-    return! Api.req "test/csrf" "post" Map.empty
-}
+let test () = 
+    Api.req<string> "test/csrf" "post" []
 
-let identity () = async {
-    let! resp = Api.req "/account/identity" "post" Map.empty
-    return Api.toObject<User> resp
-}
+let identity () =
+    Api.req<User> "/account/identity" "post" []

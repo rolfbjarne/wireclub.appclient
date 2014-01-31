@@ -26,14 +26,15 @@ let baseUrl = "http://dev.wireclub.com"
 type ApiFailureType =
 | Timeout
 | HttpError of int
+| Deserialization
 | Exception
 
 type ApiResult<'A> =
 | ApiOk of 'A
 | ApiError of ApiFailureType * string
 
-let req (url:string) (httpMethod:string) (data:Map<string,string>)  = async {
-    try
+let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = async {
+    try        
         let url = sprintf "%s/%s" baseUrl url
         let task =
             match httpMethod.ToUpperInvariant() with
@@ -41,7 +42,7 @@ let req (url:string) (httpMethod:string) (data:Map<string,string>)  = async {
                 client.GetAsync url
 
             | "POST" -> 
-                client.PostAsync(url, new FormUrlEncodedContent(data |> Map.toArray |> Array.map (fun (k, v) -> KeyValuePair(k,v))))
+                client.PostAsync(url, new FormUrlEncodedContent(data |> List.toArray |> Array.map (fun (k, v) -> KeyValuePair(k,v))))
             | _ -> failwithf "Unsupported method: %s" httpMethod
 
         let! resp = Async.AwaitTask task
@@ -51,17 +52,16 @@ let req (url:string) (httpMethod:string) (data:Map<string,string>)  = async {
         let! content = Async.AwaitTask (resp.Content.ReadAsStringAsync())
 
         match int resp.StatusCode with
-        | 200 -> return ApiOk content
+        | 200 ->
+            if typeof<'A> = typeof<string> then
+                return ApiOk (content :> obj :?> 'A)
+            else
+                try
+                    return ApiOk (JsonConvert.DeserializeObject<'A>(content))
+                with
+                | ex -> return ApiError (Deserialization, ex.ToString())
+
         | status -> return ApiError (HttpError status, content)
     with
     | ex -> return ApiError (Exception, ex.ToString())
 }
-
-let toObject<'A> apiResult =
-    match apiResult with
-    | ApiOk content ->
-        try
-            ApiOk (JsonConvert.DeserializeObject<'A>(content))
-        with 
-        | ex -> ApiError (Exception, ex.ToString())
-    | ApiError (t, s) -> ApiError (t, s)
