@@ -13,6 +13,8 @@ let login username password = async {
     match Api.toObject<Wireclub.Boundary.LoginResult> resp with
     | Api.ApiOk result ->
         Api.client.DefaultRequestHeaders.TryAddWithoutValidation("x-csrf-token", result.Csrf) |> ignore
+        Api.userId <- result.Id
+        Api.userHash <- result.Csrf
         return Api.ApiOk result
     | resp -> return resp
 }
