@@ -20,8 +20,12 @@ let mutable userId = ""
 let mutable userHash = ""
 
 //let baseUrl = "http://www.wireclub.com"
+
+#if __ANDROID__
+let baseUrl = "http://192.168.0.102"
+#else
 let baseUrl = "http://dev.wireclub.com"
-//let baseUrl = "http://192.168.0.102"
+#endif
 
 type ApiFailureType =
 | Timeout
