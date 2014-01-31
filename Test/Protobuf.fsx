@@ -1,5 +1,5 @@
 ﻿
-#r "./bin/debug/protobuf-net.dll"  
+#r "../bin/debug/protobuf-net.dll"  
 
 open System.IO
 open ProtoBuf

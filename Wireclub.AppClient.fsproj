@@ -52,6 +52,8 @@
   <Import Project="$(FSharpTargetsPath)" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <ItemGroup>
+    <None Include="Test/Driver.fsx" />
+    <None Include="Test/Protobuf.fsx" />
     <Compile Include="Api.fs" />
     <Compile Include="Account.fs" />
     <Compile Include="Channel.fs" />

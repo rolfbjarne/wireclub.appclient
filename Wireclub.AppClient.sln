@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{014907
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Wireclub.AppClient.Test", "..\Wireclub.AppClient.Test\Wireclub.AppClient.Test.fsproj", "{ACF9C5DA-08AA-4774-8DC3-717DBBD7AEE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,10 @@ Global
 		{19CC469B-31DB-4D85-965F-EBAB16EB0BFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19CC469B-31DB-4D85-965F-EBAB16EB0BFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19CC469B-31DB-4D85-965F-EBAB16EB0BFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACF9C5DA-08AA-4774-8DC3-717DBBD7AEE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACF9C5DA-08AA-4774-8DC3-717DBBD7AEE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACF9C5DA-08AA-4774-8DC3-717DBBD7AEE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACF9C5DA-08AA-4774-8DC3-717DBBD7AEE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
