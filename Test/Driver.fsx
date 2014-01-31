@@ -16,12 +16,20 @@ open Newtonsoft.Json.Linq
 open Wireclub.Boundary
 open Wireclub.Boundary.Chat
 
+
+Async.RunSynchronously <| 
+    async {
+        let! _ = Account.login "unitman" "testtest"
+        ChannelClient.PrivateChatClient.init ()
+    }
+
+Api.userHash
+Api.userId
+
+
 type ChatRoom = {
     Users: ConcurrentDictionary<string, ChatUser>
 }
-
-Account.login "unitman" "testtest"
-
 
 
 module ChatClient = 

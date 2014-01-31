@@ -10,7 +10,7 @@
     <RootNamespace>Wireclub.AppClient</RootNamespace>
     <AssemblyName>Wireclub.AppClient</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
+    <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
     <Name>Wireclub.AppClient</Name>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\ChannelClient\</SolutionDir>
     <RestorePackages>true</RestorePackages>

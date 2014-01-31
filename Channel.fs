@@ -77,7 +77,7 @@ let deserializeEvents (payload:JArray) =
     |]) else [| |]
 
 
-let channelServer = "chat.wireclub.com"
+let channelServer = "192.168.0.220:10808"
 
 let url hash sequence watching ignoring =
     sprintf "http://%s/channel/%s/%i?w=%s&i=%s" channelServer hash sequence (String.concat "," watching) (String.concat "," ignoring)
@@ -87,7 +87,7 @@ let handlers = ConcurrentDictionary<string, MailboxProcessor<ChannelEvent>>()
 let client = new HttpClient()
 let rec poll sequence = async {
     try
-        printfn "Poll: %i" sequence
+        printfn "Poll: %i | %s" sequence (url Api.userHash sequence [] [])
 
         let! resp = 
             client.GetStringAsync (url Api.userHash sequence [] [])
@@ -99,6 +99,7 @@ let rec poll sequence = async {
             match handlers.TryGetValue channel with
             | true, handler ->                 
                 events |> Array.iter handler.Post
+                printfn "%s %i events" channel (events.Length)
             | _-> ()
 
         return! poll (nextSequence)
@@ -112,18 +113,19 @@ let rec poll sequence = async {
         
 Async.StartAsTask (poll 1L) |> ignore
 
-
 module PrivateChatClient =
     let processor = new MailboxProcessor<ChannelEvent>(fun inbox -> 
         let rec loop () = async {
             let! event = inbox.Receive()
             match event.Event with
-            | PrivateMessage (color, font, message) -> printfn "%s" message
-            | PrivateMessageSent (color, font, message) -> printfn "%s" message
-            | _ -> ()
+            | PrivateMessage (color, font, message) -> printfn "%s: %s" event.User message
+            | PrivateMessageSent (color, font, message) -> printfn "S: %s: %s" event.User message
+            | _ -> printfn "Unknown message: %A" event.Event
+
+            return! loop ()
         }
         loop ())
 
     let init () =
+        processor.Start()
         handlers.TryAdd(Api.userId, processor) |> ignore
-
