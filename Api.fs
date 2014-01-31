@@ -20,7 +20,8 @@ let mutable userId = ""
 let mutable userHash = ""
 
 //let baseUrl = "http://www.wireclub.com"
-let baseUrl = "http://dev.wireclub.com"
+//let baseUrl = "http://dev.wireclub.com"
+let baseUrl = "http://192.168.0.102"
 
 type ApiFailureType =
 | Timeout
@@ -58,5 +59,9 @@ let req (url:string) (httpMethod:string) (data:Map<string,string>)  = async {
 
 let toObject<'A> apiResult =
     match apiResult with
-    | ApiOk content -> ApiOk (JsonConvert.DeserializeObject<'A>(content))
+    | ApiOk content ->
+        try
+            ApiOk (JsonConvert.DeserializeObject<'A>(content))
+        with 
+        | ex -> ApiError (Exception, ex.ToString())
     | ApiError (t, s) -> ApiError (t, s)
