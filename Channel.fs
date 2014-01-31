@@ -112,20 +112,3 @@ let rec poll sequence = async {
 }
         
 Async.StartAsTask (poll 1L) |> ignore
-
-module PrivateChatClient =
-    let processor = new MailboxProcessor<ChannelEvent>(fun inbox -> 
-        let rec loop () = async {
-            let! event = inbox.Receive()
-            match event.Event with
-            | PrivateMessage (color, font, message) -> printfn "%s: %s" event.User message
-            | PrivateMessageSent (color, font, message) -> printfn "S: %s: %s" event.User message
-            | _ -> printfn "Unknown message: %A" event.Event
-
-            return! loop ()
-        }
-        loop ())
-
-    let init () =
-        processor.Start()
-        handlers.TryAdd(Api.userId, processor) |> ignore

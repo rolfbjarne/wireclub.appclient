@@ -25,4 +25,31 @@ let send receiver message = async {
     return Api.toObject<PrivateChatSendResponse> resp
 }
 
-// change online state
+let changeOnlineState state = async {
+    failwith "not implemented"
+}
+
+let initSession id = async {
+    let! session = session id
+    match session with
+    | Api.ApiOk session as response ->
+        let processor = new MailboxProcessor<ChannelEvent>(fun inbox ->             
+            let rec loop () = async {
+                let! event = inbox.Receive()
+
+                match event with
+                | { User = user } when user <> id  -> ()
+                | { Event = PrivateMessage (color, font, message) } -> printfn "%s: %s" session.DisplayName message
+                | { Event = PrivateMessageSent (color, font, message) } -> printfn "Sent: %s: %s" event.User message
+                | _ -> ()
+
+                return! loop ()
+            }
+            loop ())
+
+        processor.Start()
+        ChannelClient.handlers.TryAdd(Api.userId, processor) |> ignore
+        return response
+
+    | error -> return error
+}
