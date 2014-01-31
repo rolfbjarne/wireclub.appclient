@@ -53,7 +53,7 @@ let req (url:string) (httpMethod:string) (data:Map<string,string>)  = async {
         | 200 -> return ApiOk content
         | status -> return ApiError (HttpError status, content)
     with
-    | ex -> return ApiError (Exception ex, ex.ToString())
+    | ex -> return ApiError (Exception, ex.ToString())
 }
 
 let toObject<'A> apiResult =
