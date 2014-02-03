@@ -6,8 +6,6 @@ let mutable identity:User option = None
 
 let imageUrl imageId = Api.baseUrl + "/images/" + imageId + "/_"
 
-let fetchActiveChannels () = async {
-    let channels = Api.req "home/fetchActiveChannels"
-    ()
-}
+let fetchActiveChannels () =
+    Api.req<Wireclub.Boundary.Chat.ChatRoomDataViewModel> "home/fetchActiveChannels"
 
