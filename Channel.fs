@@ -110,5 +110,10 @@ let rec poll sequence = async {
         do! Async.Sleep (10 * 1000)
         return! poll sequence
 }
-        
-Async.StartAsTask (poll 1L) |> ignore
+
+let mutable polling = false
+
+let init () = 
+    if polling = false then
+        polling <- true
+        Async.StartAsTask (poll 1L) |> ignore
