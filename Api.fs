@@ -8,14 +8,14 @@ open Newtonsoft.Json
 open Wireclub.Boundary
 
 let version = "1.0"
-let agent =
+let mutable agent = "wireclub-app-client/" + version
 #if __ANDROID__
-    "wireclub-app-android/" + version
-#elif __IOS__
-    "wireclub-app-ios/" + version
-#else
-    "wireclub-app-client/" + version
+agent <- "wireclub-app-android/" + version
 #endif
+#if __IOS__
+agent <- "wireclub-app-ios/" + version
+#endif
+
 
 let cookies = new CookieContainer()
 let handler = new HttpClientHandler()
@@ -24,6 +24,8 @@ handler.AllowAutoRedirect <- false
 
 let client = new HttpClient(handler)
 client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", agent) |> ignore
+client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("application/json")) |> ignore
+
 
 // TEMPORARY HAX
 let mutable userId = ""

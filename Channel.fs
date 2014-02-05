@@ -113,6 +113,9 @@ let rec poll sequence = async {
 
 let mutable polling = false
 
+let reset () =
+    client.CancelPendingRequests()
+
 let init () = 
     if polling = false then
         polling <- true
