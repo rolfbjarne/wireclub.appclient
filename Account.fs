@@ -28,4 +28,4 @@ let test () =
     Api.req<string> "test/csrf" "post" []
 
 let identity () =
-    Api.req<User> "/account/identity" "post" []
+    Api.req<User> "account/identity" "post" []
