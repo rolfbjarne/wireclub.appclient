@@ -15,4 +15,5 @@ let route url =
     | Route "/users/(.+)$" [ id ] -> ()
     | Route "/topics/(.+)$" [ id ] -> ()
     | Route "/clubs/(.+)$" [ id ] -> ()
+    // ## Chat sessions
     | _ -> ()

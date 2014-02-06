@@ -31,12 +31,14 @@ client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue(
 let mutable userId = ""
 let mutable userHash = ""
 
-//let baseUrl = "http://www.wireclub.com"
+let mutable baseUrl = "http://www.wireclub.com"
 
 #if __ANDROID__
-let baseUrl = "http://192.168.0.102"
-#else
-let baseUrl = "http://dev.wireclub.com"
+baseUrl <- "http://192.168.0.102"
+#endif
+#if __IOS__
+//baseUrl <- "http://dev.wireclub.com"
+baseUrl <- "http://www.wireclub.com"
 #endif
 
 type ApiResult<'A> =
