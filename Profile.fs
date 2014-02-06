@@ -1,0 +1,4 @@
+﻿module Profile
+
+let avatar () =
+    ()
