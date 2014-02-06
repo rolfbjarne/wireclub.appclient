@@ -38,11 +38,8 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
         let url = sprintf "%s/%s" baseUrl url
         let task =
             match httpMethod.ToUpperInvariant() with
-            | "GET" -> 
-                client.GetAsync url
-
-            | "POST" -> 
-                client.PostAsync(url, new FormUrlEncodedContent(data |> List.toArray |> Array.map (fun (k, v) -> KeyValuePair(k,v))))
+            | "GET" -> client.GetAsync url
+            | "POST" -> client.PostAsync(url, new FormUrlEncodedContent(data |> List.map (fun (k, v) -> KeyValuePair(k,v))))
             | _ -> failwithf "Unsupported method: %s" httpMethod
 
         let! resp = Async.AwaitTask task
@@ -51,17 +48,19 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
         
         let! content = Async.AwaitTask (resp.Content.ReadAsStringAsync())
 
-        match int resp.StatusCode with
-        | 200 ->
-            if typeof<'A> = typeof<string> then
-                return ApiOk (content :> obj :?> 'A)
-            else
-                try
-                    return ApiOk (JsonConvert.DeserializeObject<'A>(content))
-                with
-                | ex -> return ApiError (Deserialization, ex.ToString())
-
-        | status -> return ApiError (HttpError status, content)
+        return
+            match int resp.StatusCode with
+            | 200 ->
+                if typeof<'A> = typeof<unit> then
+                    ApiOk (Unchecked.defaultof<'A>)
+                elif typeof<'A> = typeof<string> then
+                    ApiOk (content :> obj :?> 'A)
+                else
+                    try
+                        ApiOk (JsonConvert.DeserializeObject<'A>(content))
+                    with
+                    | ex -> ApiError (Deserialization, ex.ToString())
+            | status -> ApiError (HttpError status, content)
     with
     | ex -> return ApiError (Exception, ex.ToString())
 }

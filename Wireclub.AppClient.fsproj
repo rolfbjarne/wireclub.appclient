@@ -60,6 +60,8 @@
     <Compile Include="App.fs" />
     <Compile Include="Chat.fs" />
     <Compile Include="PrivateChat.fs" />
+    <Compile Include="User.fs" />
+    <Compile Include="Entity.fs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

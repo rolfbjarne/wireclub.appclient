@@ -17,9 +17,9 @@ let send receiver message =
             "line", message
         ])
 
-let changeOnlineState state = async {
-    failwith "not implemented"
-}
+let changeOnlineState (state:OnlineStateType) = 
+    Api.req<unit> ("privateChat/changeOnlineState") "post" [ "state", string (int state) ]
+
 
 let initSession id = async {
     let! session = session id
