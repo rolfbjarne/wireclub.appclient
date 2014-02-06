@@ -3,21 +3,10 @@
 open Wireclub.Boundary.Chat
 
 let directory () =
-    Api.req<ChatRoomDataViewModel[]> "chat/directory" "get" []
-    (*Api.ApiResult.ApiOk (
-        [|
-            {
-                Id = "aaa"
-                Name = "Chat Room"
-                Slug = "chat_room"
-                Url = "/chat/rooms/chat_room"
-                Apps = [| |]
-                JoinPolicy = 0
-            }
-        |])*)
+    Api.req<ChatDirectoryViewModel> "chat/directory" "get" []
 
 let join slug =
-    Api.req<JoinResult> ("chat/" + slug + "/join") "post" []
+    Api.req<JoinResult> ("chat/room/" + slug + "/join") "post" []
 
 let leave () =
     ()

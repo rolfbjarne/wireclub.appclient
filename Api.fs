@@ -31,7 +31,7 @@ client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue(
 let mutable userId = ""
 let mutable userHash = ""
 
-let mutable baseUrl = "http://www.wireclub.com"
+let mutable baseUrl = "http://dev.wireclub.com"
 
 #if __ANDROID__
 baseUrl <- "http://192.168.0.102"
@@ -47,7 +47,7 @@ type ApiResult<'A> =
 | Unauthorized
 | Timeout
 | HttpError of int * string
-| Deserialization of Exception
+| Deserialization of Exception * string
 | Exception of Exception
 
 let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = async {
@@ -71,12 +71,12 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
             try
                 return ApiOk (JsonConvert.DeserializeObject<'A>(content))
             with
-            | ex -> return Deserialization ex
+            | ex -> return Deserialization (ex, content)
         | 400 -> 
             try
                 return BadRequest (JsonConvert.DeserializeObject<ApiError[]>(content))
             with
-            | ex -> return Deserialization ex
+            | ex -> return Deserialization (ex, content)
         | 401 -> return Unauthorized
         | status -> return HttpError (status, content)
     with
