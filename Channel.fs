@@ -79,18 +79,22 @@ let deserializeEvents (payload:JArray) =
 
 let channelServer = "192.168.0.220:10808"
 
-let url hash sequence watching ignoring =
+let handlers = ConcurrentDictionary<string, MailboxProcessor<ChannelEvent>>()
+let mutable sequence = 1L
+let mutable polling = false
+let watching = System.Collections.Generic.List<string>()
+
+let url hash sequence ignoring =
     sprintf "http://%s/channel/%s/%i?w=%s&i=%s" channelServer hash sequence (String.concat "," watching) (String.concat "," ignoring)
 
-let handlers = ConcurrentDictionary<string, MailboxProcessor<ChannelEvent>>()
 
 let client = new HttpClient()
-let rec poll sequence = async {
+let rec poll () = async {
     try
-        printfn "Poll: %i | %s" sequence (url Api.userHash sequence [] [])
+        printfn "Poll: %i | %s" sequence (url Api.userHash sequence [])
 
         let! resp = 
-            client.GetStringAsync (url Api.userHash sequence [] [])
+            client.GetStringAsync (url Api.userHash sequence [])
             |> Async.AwaitTask
         
         let payload = JsonConvert.DeserializeObject resp :?> JArray
@@ -102,21 +106,21 @@ let rec poll sequence = async {
                 printfn "%s %i events" channel (events.Length)
             | _-> ()
 
-        return! poll (nextSequence)
+        sequence <- nextSequence
+        return! poll ()
     with
     | ex -> 
         printfn "Poll error: %s" (ex.ToString())
         // TODO: Backoff
         do! Async.Sleep (10 * 1000)
-        return! poll sequence
+        return! poll ()
 }
-
-let mutable polling = false
 
 let reset () =
     client.CancelPendingRequests()
+    Async.StartAsTask (poll ()) |> ignore
 
 let init () = 
     if polling = false then
         polling <- true
-        Async.StartAsTask (poll 1L) |> ignore
+        Async.StartAsTask (poll ()) |> ignore

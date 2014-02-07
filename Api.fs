@@ -37,8 +37,8 @@ let mutable baseUrl = "http://dev.wireclub.com"
 baseUrl <- "http://192.168.0.102"
 #endif
 #if __IOS__
-//baseUrl <- "http://dev.wireclub.com"
-baseUrl <- "http://www.wireclub.com"
+baseUrl <- "http://dev.wireclub.com"
+//baseUrl <- "http://www.wireclub.com"
 #endif
 
 type ApiResult<'A> =
