@@ -22,11 +22,13 @@ let join slug = async {
         return resp
     }
 
-let leave () =
-    ()
+let leave slug =
+    Api.req<string> ("/chat/room/" + slug + "/leave") "post" [ ]
 
-let send () =
-    ()
+let send slug line =
+    Api.req<ChannelPostResult> ("/chat/room/" + slug + "/send2") "post" [
+        "line", line
+    ]
 
 let acceptDrink () =
     ()
@@ -42,6 +44,6 @@ let getAd () =
 
 let changePreferences (font:int) (color:int) =
     Api.req<unit> "chat/changePreferences" "post" [
-            "font", (font.ToString())
-            "color", (color.ToString())
+            "font", font.ToString()
+            "color", color.ToString()
         ]
