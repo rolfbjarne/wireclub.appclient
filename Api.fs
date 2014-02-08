@@ -77,7 +77,8 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
                 return BadRequest (JsonConvert.DeserializeObject<ApiError[]>(content))
             with
             | ex -> return Deserialization (ex, content)
-        | 401 -> return Unauthorized
+        | 401
+        | 403 -> return Unauthorized
         | status -> return HttpError (status, content)
     with
     | ex -> return Exception ex

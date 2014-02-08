@@ -62,10 +62,9 @@
     <Compile Include="App.fs" />
     <Compile Include="Chat.fs" />
     <Compile Include="PrivateChat.fs" />
-    <Compile Include="User.fs" />
-    <Compile Include="Entity.fs" />
     <Compile Include="Routes.fs" />
     <Compile Include="Alerts.fs" />
+    <Compile Include="Web.fs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -74,7 +73,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="protobuf-net">
