@@ -1,15 +1,17 @@
 ﻿module Account
 
+open System
+open Newtonsoft.Json
 open Wireclub.Boundary
 open Wireclub.Boundary.Models
-open Newtonsoft.Json
 
 let handleLogin result =
     match result with
     | Api.ApiOk result ->
         Api.client.DefaultRequestHeaders.TryAddWithoutValidation("x-csrf-token", result.Csrf) |> ignore
         Api.userId <- result.Identity.Id
-        Api.userHash <- result.Csrf
+        Api.userCsrf <- result.Csrf
+        Api.userToken <- result.Token
         Api.ApiOk result
     | resp -> resp
 
@@ -42,3 +44,18 @@ let test () =
 
 let identity () =
     Api.req<User> "account/identity" "post" []
+
+let signup email password = 
+    Api.req<LoginResult> "/api/account/signup" "post" [
+        "userId", "000000000000000000000000"
+        "email", email
+        "password", password
+    ]
+
+let logout () =
+    Api.userId <- ""
+    Api.userToken <- ""
+    Api.userCsrf <- ""
+    for cookie in Api.handler.CookieContainer.GetCookies(new Uri(Api.baseUrl)) do
+        cookie.Expires <- DateTime.UtcNow.AddHours(-1.0)
+    

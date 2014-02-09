@@ -29,7 +29,8 @@ client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue(
 
 // TEMPORARY HAX
 let mutable userId = ""
-let mutable userHash = ""
+let mutable userToken = ""
+let mutable userCsrf = ""
 
 let mutable baseUrl = "http://dev.wireclub.com"
 

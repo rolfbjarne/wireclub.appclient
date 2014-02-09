@@ -91,10 +91,10 @@ let url hash sequence ignoring =
 let client = new HttpClient()
 let rec poll () = async {
     try
-        printfn "Poll: %i | %s" sequence (url Api.userHash sequence [])
+        printfn "Poll: %i | %s" sequence (url Api.userCsrf sequence [])
 
         let! resp = 
-            client.GetStringAsync (url Api.userHash sequence [])
+            client.GetStringAsync (url Api.userCsrf sequence [])
             |> Async.AwaitTask
         
         let payload = JsonConvert.DeserializeObject resp :?> JArray

@@ -63,8 +63,6 @@
     <Compile Include="Chat.fs" />
     <Compile Include="PrivateChat.fs" />
     <Compile Include="Routes.fs" />
-    <Compile Include="Alerts.fs" />
-    <Compile Include="Web.fs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
