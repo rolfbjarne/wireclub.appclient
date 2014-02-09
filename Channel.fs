@@ -37,6 +37,7 @@ let deserializeEventList (events:JToken) =
                 User = message.[4].Value<string>()
                 Event = 
                     match message.[1].Value<int>() with
+                    | 0 -> Notification (payload.Value<string>())
                     | 1 -> Message (payload.[0].Value<string>(), payload.[1].Value<int>(), payload.[2].Value<string>())
                     | 2 -> Join (deserializeUser payload)
                     | 3 -> Leave (payload.Value<string>())
