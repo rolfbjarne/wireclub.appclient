@@ -45,12 +45,17 @@ let test () =
 let identity () =
     Api.req<User> "account/identity" "post" []
 
-let signup email password = 
-    Api.req<LoginResult> "/api/account/signup" "post" [
-        "userId", "000000000000000000000000"
-        "email", email
-        "password", password
-    ]
+let signup email password = async {
+    let! result = 
+        Api.req<LoginResult> "/api/account/signup" "post" 
+            [
+                "userId", "000000000000000000000000"
+                "email", email
+                "password", password
+            ]
+
+    return handleLogin result
+}
 
 let logout () =
     Api.userId <- ""

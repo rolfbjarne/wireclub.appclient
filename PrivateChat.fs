@@ -1,8 +1,10 @@
 ﻿module PrivateChat
 
 open Newtonsoft.Json
+open Wireclub.Models
 open Wireclub.Boundary
 open Wireclub.Boundary.Chat
+open ChannelEvent
 
 let online () =
     Api.req<PrivateChatFriendsOnline> "privateChat/online" "get" []

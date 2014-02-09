@@ -5,6 +5,7 @@ open System.Collections.Concurrent
 open System.Net.Http
 open Newtonsoft.Json
 open Newtonsoft.Json.Linq
+open ChannelEvent
 open Wireclub.Boundary
 open Wireclub.Boundary.Chat
 
