@@ -44,7 +44,7 @@ baseUrl <- "http://dev.wireclub.com"
 
 type ApiResult<'A> =
 | ApiOk of 'A
-| BadRequest of ApiError[]
+| BadRequest of ApiError list
 | Unauthorized
 | Timeout
 | HttpError of int * string
@@ -75,7 +75,7 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
             | ex -> return Deserialization (ex, content)
         | 400 -> 
             try
-                return BadRequest (JsonConvert.DeserializeObject<ApiError[]>(content))
+                return BadRequest (JsonConvert.DeserializeObject<ApiError[]>(content) |> List.ofArray)
             with
             | ex -> return Deserialization (ex, content)
         | 401
