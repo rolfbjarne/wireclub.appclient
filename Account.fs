@@ -47,7 +47,7 @@ let identity () =
 
 let signup email password = async {
     let! result = 
-        Api.req<LoginResult> "/api/account/signup" "post" 
+        Api.req<LoginResult> "api/account/signup" "post" 
             [
                 "userId", "000000000000000000000000"
                 "email", email
@@ -64,3 +64,8 @@ let logout () =
     for cookie in Api.handler.CookieContainer.GetCookies(new Uri(Api.baseUrl)) do
         cookie.Expires <- DateTime.UtcNow.AddHours(-1.0)
     
+let resetPassword email = 
+    Api.req<string> "account/doPasswordResetRequest" "post" 
+        [
+            "email", email
+        ]
