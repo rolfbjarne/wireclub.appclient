@@ -56,15 +56,17 @@ type ApiResult<'A> =
 // Await untyped Task
 let awaitTask (t: Task) = t.ContinueWith (fun t -> ()) |> Async.AwaitTask
 
+let fullUrl (url:string) =
+    match url.Contains("://") with
+    | true -> url
+    | false -> Uri(Uri(baseUrl), url).ToString()
+
 let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = async {
     try
         let stopwatch = Stopwatch()
         stopwatch.Start()
 
-        let url = 
-            match url.Contains("://") with
-            | true -> url
-            | false -> Uri(Uri(baseUrl), url).ToString()
+        let url = fullUrl url
 
         let task =
             match httpMethod.ToUpperInvariant() with
