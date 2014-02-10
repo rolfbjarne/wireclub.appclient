@@ -35,6 +35,7 @@ let mutable userToken = ""
 let mutable userCsrf = ""
 
 let mutable baseUrl = "http://dev.wireclub.com"
+let mutable staticBaseUrl = "http://dev.wireclub.com"
 
 #if __ANDROID__
 baseUrl <- "http://192.168.0.102"
@@ -54,7 +55,7 @@ type ApiResult<'A> =
 | Exception of Exception
 
 // Await untyped Task
-let awaitTask (t: Task) = t.ContinueWith (fun t -> ()) |> Async.AwaitTask
+let awaitTask (t: Task) = t |> Async.AwaitIAsyncResult |> Async.Ignore
 
 let fullUrl (url:string) =
     match url.Contains("://") with

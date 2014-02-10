@@ -10,11 +10,14 @@ open Wireclub.Boundary
 open Wireclub.Boundary.Chat
 
 let deserializeUser (payload:JToken) =
+    // Rewrite the avatar to be an image token
+    let avatar = payload.[3].Value<string>().Split('/')
+    let avatar = avatar.[avatar.Length - 2] + "/" + avatar.[avatar.Length - 1]
     {
         Id = payload.[0].Value<string>()
         Name = payload.[1].Value<string>()
         Slug = payload.[2].Value<string>()
-        Avatar20 = payload.[3].Value<string>()
+        Avatar = avatar
         Blocked = Convert.ToBoolean (payload.[4].Value<int>())
         Friend = Convert.ToBoolean (payload.[5].Value<int>())
         Moderator = Convert.ToBoolean (payload.[6].Value<int>())
@@ -24,7 +27,6 @@ let deserializeUser (payload:JToken) =
         Location = payload.[10].Value<string>()
         Url = payload.[11].Value<string>()
         Membership = payload.[12].Value<string>()
-        Avatar35 = payload.[13].Value<string>()
     }
 
 let deserializeEventList (events:JToken) =
