@@ -43,7 +43,7 @@ let imageUrl (imageId:string) size =
     | [| imageId; dimensions |] ->
         match (tokenDecode dimensions).Split ',' with
         | [| width; height; hash |] ->
-            sprintf "%s/%s" imageId (tokenEncode (sprintf "%i,%i,%s" size size hash))
+            sprintf "%s/images/%s/%s" Api.staticBaseUrl imageId (tokenEncode (sprintf "%i,%i,%s" size size hash))
         | _ -> failwith "Invalid imageId (dimension)"
     | _ -> failwith "Invalid image id"
 
