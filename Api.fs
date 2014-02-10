@@ -3,7 +3,9 @@
 open System
 open System.Net
 open System.Net.Http
+open System.Threading.Tasks
 open System.Collections.Generic
+open System.Diagnostics
 open Newtonsoft.Json
 open Wireclub.Boundary
 
@@ -51,9 +53,19 @@ type ApiResult<'A> =
 | Deserialization of Exception * string
 | Exception of Exception
 
+// Await untyped Task
+let awaitTask (t: Task) = t.ContinueWith (fun t -> ()) |> Async.AwaitTask
+
 let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = async {
-    try        
-        let url = sprintf "%s/%s" baseUrl url
+    try
+        let stopwatch = Stopwatch()
+        stopwatch.Start()
+
+        let url = 
+            match url.Contains("://") with
+            | true -> url
+            | false -> Uri(Uri(baseUrl), url).ToString()
+
         let task =
             match httpMethod.ToUpperInvariant() with
             | "GET" -> client.GetAsync url
@@ -61,26 +73,37 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
             | _ -> failwithf "Unsupported method: %s" httpMethod
 
         let! resp = Async.AwaitTask task
+        do! (awaitTask (resp.Content.LoadIntoBufferAsync()))
 
-        printfn "HTTP:%s %s %i" httpMethod url (int resp.StatusCode)
-        
-        let! content = Async.AwaitTask (resp.Content.ReadAsStringAsync())        
+        printfn "HTTP:%s %s %i %ims" httpMethod url (int resp.StatusCode) (stopwatch.ElapsedMilliseconds)
+
+        let stringContent () = 
+            Async.AwaitTask (resp.Content.ReadAsStringAsync())
 
         match int resp.StatusCode with
-        | 200 when typeof<'A> = typeof<string> -> return ApiOk (content :> obj :?> 'A)
+        | 200 when typeof<'A> = typeof<byte[]> -> 
+            let! content = Async.AwaitTask (resp.Content.ReadAsByteArrayAsync ())
+            return ApiOk (content :> obj :?> 'A)
+        | 200 when typeof<'A> = typeof<string> -> 
+            let! content = stringContent ()
+            return ApiOk (content :> obj :?> 'A)
         | 200 ->
+            let! content = stringContent ()
             try
                 return ApiOk (JsonConvert.DeserializeObject<'A>(content))
             with
             | ex -> return Deserialization (ex, content)
         | 400 -> 
+            let! content = stringContent ()
             try
                 return BadRequest (JsonConvert.DeserializeObject<ApiError[]>(content) |> List.ofArray)
             with
             | ex -> return Deserialization (ex, content)
         | 401
         | 403 -> return Unauthorized
-        | status -> return HttpError (status, content)
+        | status -> 
+            let! content = stringContent ()
+            return HttpError (status, content)
     with
     | ex -> return Exception ex
 }

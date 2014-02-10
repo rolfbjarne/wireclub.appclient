@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -56,8 +56,8 @@
   <ItemGroup>
     <Compile Include="Api.fs" />
     <Compile Include="Account.fs" />
-    <Compile Include="Alerts.fs" />
     <Compile Include="App.fs" />
+    <Compile Include="ChannelEvent.fs" />
     <Compile Include="Channel.fs" />
     <Compile Include="Chat.fs" />
     <Compile Include="PrivateChat.fs" />

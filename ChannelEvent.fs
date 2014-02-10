@@ -4,7 +4,7 @@ open Wireclub.Boundary.Chat
 
 type ChannelEventType =
 | Unknown
-| Notification
+| Notification of string
 | Message of (*color:*) string * (*font:*) int * (*message:*) string
 | Join of (* user: *) ChatUser
 | Leave of string
