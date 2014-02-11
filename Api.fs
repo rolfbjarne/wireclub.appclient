@@ -45,6 +45,14 @@ baseUrl <- "http://dev.wireclub.com"
 //baseUrl <- "http://www.wireclub.com"
 #endif
 
+#if __ANDROID__
+staticBaseUrl <- "http://192.168.0.102"
+#endif
+#if __IOS__
+staticBaseUrl <- "http://dev.wireclub.com"
+//baseUrl <- "http://www.wireclub.com"
+#endif
+
 type ApiResult<'A> =
 | ApiOk of 'A
 | BadRequest of ApiError list
