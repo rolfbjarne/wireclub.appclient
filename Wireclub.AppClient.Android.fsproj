@@ -25,8 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <ConsolePause>false</ConsolePause>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <PlatformTarget>
-    </PlatformTarget>
+    <PlatformTarget></PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,8 +35,7 @@
     <DefineConstants>__MOBILE__;__ANDROID__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <Tailcalls>true</Tailcalls>
-    <PlatformTarget>
-    </PlatformTarget>
+    <PlatformTarget></PlatformTarget>
     <ConsolePause>false</ConsolePause>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
   </PropertyGroup>
@@ -61,9 +59,15 @@
     <Compile Include="Api.fs" />
     <Compile Include="Account.fs" />
     <Compile Include="App.fs" />
+    <Compile Include="ChannelEvent.fs" />
     <Compile Include="Channel.fs" />
     <Compile Include="Chat.fs" />
     <Compile Include="PrivateChat.fs" />
+    <Compile Include="Entity.fs" />
+    <Compile Include="Profile.fs" />
+    <Compile Include="Routes.fs" />
+    <Compile Include="Settings.fs" />
+    <Compile Include="User.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\NEXT\Wireclub.Boundary\Wireclub.Boundary.Android.fsproj">
