@@ -1,6 +1,7 @@
 ﻿
 module Chat
 
+open System
 open Wireclub.Boundary.Chat
 open Newtonsoft.Json
 open Newtonsoft.Json.Linq
@@ -13,12 +14,16 @@ let join slug = async {
         let resp =
             match resp with
             | Api.ApiOk result ->
-                let events = 
-                    JsonConvert.DeserializeObject result.Events :?> JToken
-                    |> ChannelClient.deserializeEventList
+                try
+                    let events = 
+                        JsonConvert.DeserializeObject result.Events :?> JToken
+                        |> ChannelClient.deserializeEventList
 
-                Api.ApiOk (result, events)
-            | error -> failwith "ahh" // ## TODO
+                    Api.ApiOk (result, events)
+                with
+                // ## TODO handle failer better
+                | ex -> Api.Exception ex
+            | error -> Api.Exception (new Exception())
         return resp
     }
 
