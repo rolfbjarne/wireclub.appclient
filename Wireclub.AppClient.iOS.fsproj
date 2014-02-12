@@ -52,6 +52,10 @@
       <Project>{F83837F7-71B9-4EEB-85B8-276B8767DA2B}</Project>
       <Name>Wireclub.Boundary.iOS</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Projects\websocket-sharp\websocket-sharp\websocket-sharp-ios.csproj">
+      <Project>{D476C912-8459-4A6B-AA01-CE3EFDD89CFF}</Project>
+      <Name>websocket-sharp-ios</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api.fs" />

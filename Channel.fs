@@ -9,6 +9,7 @@ open ChannelEvent
 open Wireclub.Boundary.Models
 open Wireclub.Boundary
 open Wireclub.Boundary.Chat
+open WebSocketSharp
 
 let deserializeUser (payload:JToken) =
     // Rewrite the avatar to be an image token
@@ -30,47 +31,53 @@ let deserializeUser (payload:JToken) =
         Membership = payload.[12].Value<string>()
     }
 
+let deserializeEvent sequence eventType stamp (payload:JToken) user =
+    { 
+        Sequence = sequence
+        User = user
+        Event = 
+            match eventType with
+            | 0 -> Notification (payload.Value<string>())
+            | 1 -> Message (payload.[0].Value<string>(), payload.[1].Value<int>(), payload.[2].Value<string>())
+            | 2 -> Join (deserializeUser payload)
+            | 3 -> Leave (payload.Value<string>())
+            | 4 -> Modifier
+            | 5 -> Drink
+            | 6 -> ThumbsUp
+            | 7 -> ThumbsDown
+            | 8 -> Preference
+            | 9 -> AddedInvitation
+            | 10 -> AddedModerator
+            | 11 -> RemovedModerator
+            | 12 -> Ticker
+            | 13 -> AppEvent
+            | 14 -> AcceptDrink
+            | 15 -> CustomAppEvent
+            | 16 -> StartApp
+            | 17 -> QuitApp
+            | 18 -> GameChallenge
+            | 19 -> GameMatch
+            | 20 -> KeepAlive
+            | 21 -> DisposableMessage
+            | 102 -> PrivateMessage (payload.[0].Value<string>(), payload.[1].Value<int>(), payload.[2].Value<string>())
+            | 103 -> PrivateMessageSent (payload.[0].Value<string>(), payload.[1].Value<int>(), payload.[2].Value<string>())
+            | 1000 -> PeekAvailable
+            | 10000 -> BingoRoundChanged
+            | 10001 -> BingoRoundDraw
+            | 10002 -> BingoRoundWon
+            | _ -> Unknown
+    }
+
+let deserializeEventToken (event:JToken) =
+    let sequence = event.[0].Value<int64>()
+    let eventType = event.[1].Value<int>()
+    let stamp = event.[2]
+    let payload = event.[3]
+    let user = event.[4].Value<string>()
+    deserializeEvent sequence eventType stamp payload user
+
 let deserializeEventList (events:JToken) =
-    [|
-        for message in events ->
-            let _ = message.[2] // ???
-            let payload = message.[3]
-            { 
-                Sequence = message.[0].Value<int64>() 
-                User = message.[4].Value<string>()
-                Event = 
-                    match message.[1].Value<int>() with
-                    | 0 -> Notification (payload.Value<string>())
-                    | 1 -> Message (payload.[0].Value<string>(), payload.[1].Value<int>(), payload.[2].Value<string>())
-                    | 2 -> Join (deserializeUser payload)
-                    | 3 -> Leave (payload.Value<string>())
-                    | 4 -> Modifier
-                    | 5 -> Drink
-                    | 6 -> ThumbsUp
-                    | 7 -> ThumbsDown
-                    | 8 -> Preference
-                    | 9 -> AddedInvitation
-                    | 10 -> AddedModerator
-                    | 11 -> RemovedModerator
-                    | 12 -> Ticker
-                    | 13 -> AppEvent
-                    | 14 -> AcceptDrink
-                    | 15 -> CustomAppEvent
-                    | 16 -> StartApp
-                    | 17 -> QuitApp
-                    | 18 -> GameChallenge
-                    | 19 -> GameMatch
-                    | 20 -> KeepAlive
-                    | 21 -> DisposableMessage
-                    | 102 -> PrivateMessage (payload.[0].Value<string>(), payload.[1].Value<int>(), payload.[2].Value<string>())
-                    | 103 -> PrivateMessageSent (payload.[0].Value<string>(), payload.[1].Value<int>(), payload.[2].Value<string>())
-                    | 1000 -> PeekAvailable
-                    | 10000 -> BingoRoundChanged
-                    | 10001 -> BingoRoundDraw
-                    | 10002 -> BingoRoundWon
-                    | _ -> Unknown
-            }
-    |]
+    events |> Seq.map deserializeEventToken |> Seq.toArray
 
 let deserializeEvents (payload:JArray) =
     payload.[0].Value<int64>(),
@@ -82,50 +89,56 @@ let deserializeEvents (payload:JArray) =
     |]) else [| |]
 
 
-let channelServer = "192.168.0.220:10808"
+let channelServer = "ws://dev.wireclub.com:8888/events"
 
 let handlers = ConcurrentDictionary<string, MailboxProcessor<ChannelEvent>>()
-let mutable sequence = 1L
+let mutable sequence = 0L
 let mutable polling = false
 let watching = System.Collections.Generic.List<string>()
 
-let url hash sequence ignoring =
-    sprintf "http://%s/channel/%s/%i?w=%s&i=%s" channelServer hash sequence (String.concat "," watching) (String.concat "," ignoring)
+let mutable (webSocket:WebSocket option) = None
 
+let rec init () = 
+    if webSocket = None then
+        let client = new WebSocket(channelServer, Compression = CompressionMethod.DEFLATE)
+        webSocket <- Some client
 
-let client = new HttpClient()
-let rec poll () = async {
-    try
-        printfn "Poll: %i | %s" sequence (url Api.userCsrf sequence [])
+        client.OnMessage.Add (fun data -> 
+            try
+                let event = JsonConvert.DeserializeObject data.Data :?> JArray
+                let channel = event.[0].Value<string>()
+                let sequence = event.[1].Value<int64>()
+                let eventType = event.[2].Value<int>()
+                let stamp = event.[3]
+                let payload = event.[4]
+                let user = event.[5].Value<string>()
+                let event = deserializeEvent sequence eventType stamp payload user
+                match handlers.TryGetValue channel with
+                | true, handler -> handler.Post event
+                | _ -> ()
+            with
+            | ex -> printfn "[Channel] Message error: %s" (ex.ToString())
+        )
 
-        let! resp = 
-            client.GetStringAsync (url Api.userCsrf sequence [])
-            |> Async.AwaitTask
-        
-        let payload = JsonConvert.DeserializeObject resp :?> JArray
-        let nextSequence, channels = deserializeEvents payload
-        for channel, events in channels do            
-            match handlers.TryGetValue channel with
-            | true, handler ->                 
-                events |> Array.iter handler.Post
-                printfn "%s %i events" channel (events.Length)
-            | _-> ()
+        printfn "[Channel] Opening websocket connection %s" channelServer
 
-        sequence <- nextSequence
-        return! poll ()
-    with
-    | ex -> 
-        printfn "Poll error: %s" (ex.ToString())
-        // TODO: Backoff
-        do! Async.Sleep (10 * 1000)
-        return! poll ()
-}
+        client.ConnectAsync()
 
-let reset () =
-    client.CancelPendingRequests()
-    Async.StartAsTask (poll ()) |> ignore
+        client.OnOpen.Add (fun _ ->
+            client.Send("auth=" + Api.userToken)
+            client.Send("seq=" + sequence.ToString())
+            printfn "[Channel] Connection open"
+        )
 
-let init () = 
-    if polling = false then
-        polling <- true
-        Async.StartAsTask (poll ()) |> ignore
+        client.OnError.Add (fun e ->
+            printfn "[Channel] Websocket error: %s" e.Message
+            client.CloseAsync ()
+            webSocket <- None
+            init ()
+        )
+
+        client.OnClose.Add (fun e ->
+            printfn "[Channel] Websocket closed: %s" e.Reason
+            webSocket <- None
+            init ()
+        )
