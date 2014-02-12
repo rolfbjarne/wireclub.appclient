@@ -8,12 +8,6 @@ let (|Route|_|) (route:string) (url:string) =
     else 
         None
 
-let route url =
-    match url with
-    | Route "/chat/room/(.+)$" [ id ] -> ()
-    | Route "/users/(.+)/pictures/(.+)/picture/(.+)$" [ user; album; image ] -> ()
-    | Route "/users/(.+)$" [ id ] -> ()
-    | Route "/topics/(.+)$" [ id ] -> ()
-    | Route "/clubs/(.+)$" [ id ] -> ()
-    // ## Chat sessions
-    | _ -> ()
+let (|User|_|) = function | Route "/users/(.+)$" [ id ] -> Some id | _ -> None
+let (|ChatRoom|_|) = function | Route "/users/(.+)$" [ id ] -> Some id | _ -> None
+let (|ChatSession|_|) = function | Route "/privateChat/session/(.+)$" [ id ] -> Some id | _ -> None

@@ -37,6 +37,8 @@ let mutable userCsrf = ""
 let mutable baseUrl = "http://dev.wireclub.com"
 let mutable staticBaseUrl = "http://dev.wireclub.com"
 
+let debugSlowNetwork = false
+
 #if __ANDROID__
 baseUrl <- "http://192.168.0.102"
 #endif
@@ -76,6 +78,9 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
         stopwatch.Start()
 
         let url = fullUrl url
+
+        if debugSlowNetwork then
+            do! Async.Sleep (5 * 1000)
 
         let task =
             match httpMethod.ToUpperInvariant() with
