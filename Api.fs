@@ -28,31 +28,25 @@ let client = new HttpClient(handler)
 client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", agent) |> ignore
 client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("application/json")) |> ignore
 
+let debugSlowNetwork = false
 
-// TEMPORARY HAX
 let mutable userId = ""
 let mutable userToken = ""
 let mutable userCsrf = ""
 
-let mutable baseUrl = "http://dev.wireclub.com"
-let mutable staticBaseUrl = "http://dev.wireclub.com"
-
-let debugSlowNetwork = false
+let mutable baseUrl = "http://www.wireclub.com"
+let mutable staticBaseUrl = "http://static.wireclub.com"
+let mutable channelServer = "ws://chat.wireclub.com:8888/events"
 
 #if __ANDROID__
 baseUrl <- "http://192.168.0.102"
+staticBaseUrl <- "http://192.168.0.102"
+channelServer <- "ws://dev.wireclub.com:8888/events"
 #endif
 #if __IOS__
 baseUrl <- "http://dev.wireclub.com"
-//baseUrl <- "http://www.wireclub.com"
-#endif
-
-#if __ANDROID__
-staticBaseUrl <- "http://192.168.0.102"
-#endif
-#if __IOS__
 staticBaseUrl <- "http://dev.wireclub.com"
-//baseUrl <- "http://www.wireclub.com"
+channelServer <- "ws://dev.wireclub.com:8888/events"
 #endif
 
 type ApiResult<'A> =

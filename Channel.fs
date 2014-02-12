@@ -88,19 +88,13 @@ let deserializeEvents (payload:JArray) =
             deserializeEventList (channelMessages.[1])
     |]) else [| |]
 
-
-let channelServer = "ws://dev.wireclub.com:8888/events"
-
 let handlers = ConcurrentDictionary<string, MailboxProcessor<ChannelEvent>>()
 let mutable sequence = 0L
-let mutable polling = false
-let watching = System.Collections.Generic.List<string>()
-
 let mutable (webSocket:WebSocket option) = None
 
 let rec init () = 
     if webSocket = None then
-        let client = new WebSocket(channelServer, Compression = CompressionMethod.DEFLATE)
+        let client = new WebSocket(Api.channelServer, Compression = CompressionMethod.DEFLATE)
         webSocket <- Some client
 
         client.OnMessage.Add (fun data -> 
@@ -120,7 +114,7 @@ let rec init () =
             | ex -> printfn "[Channel] Message error: %s" (ex.ToString())
         )
 
-        printfn "[Channel] Opening websocket connection %s" channelServer
+        printfn "[Channel] Opening websocket connection %s" Api.channelServer
 
         client.ConnectAsync()
 
