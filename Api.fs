@@ -41,7 +41,7 @@ let mutable channelServer = "ws://chat.wireclub.com:8888/events"
 #if __ANDROID__
 baseUrl <- "http://192.168.0.102"
 staticBaseUrl <- "http://192.168.0.102"
-channelServer <- "ws://dev.wireclub.com:8888/events"
+channelServer <- "ws://192.168.0.102:8888/events"
 #endif
 #if __IOS__
 baseUrl <- "http://dev.wireclub.com"

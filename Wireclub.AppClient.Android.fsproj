@@ -77,5 +77,9 @@
       <Project>{582752E5-FC75-4D58-BC9F-E4B0931C9E4E}</Project>
       <Name>Wireclub.Boundary.Android</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WebSocketSharp.Android\WebSocketSharp.Android.csproj">
+      <Project>{C9CF5A43-A245-43B7-A999-35B76271C498}</Project>
+      <Name>WebSocketSharp.Android</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
