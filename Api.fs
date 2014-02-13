@@ -97,6 +97,8 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
         | 200 when typeof<'A> = typeof<string> -> 
             let! content = stringContent ()
             return ApiOk (content :> obj :?> 'A)
+        | 200 when typeof<'A> = typeof<unit> ->
+            return ApiOk (() :> obj :?> 'A)
         | 200 ->
             let! content = stringContent ()
             try
@@ -117,3 +119,6 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
     with
     | ex -> return Exception ex
 }
+
+let post<'A> url = req<'A> url "POST" []
+let get<'A> url = req<'A> url "GET" []
