@@ -89,50 +89,56 @@ let deserializeEvents (payload:JArray) =
     |]) else [| |]
 
 let handlers = ConcurrentDictionary<string, MailboxProcessor<ChannelEvent>>()
-let mutable sequence = 0L
-let mutable (webSocket:WebSocket option) = None
 
-let rec init () = 
-    if webSocket = None then
-        let client = new WebSocket(Api.channelServer, Compression = CompressionMethod.DEFLATE)
-        webSocket <- Some client
+let init = 
+    let mutex = obj()
+    let sequence = ref 0L
+    let (webSocket:Ref<WebSocket option>) = ref None
 
-        client.OnMessage.Add (fun data -> 
-            try
-                let event = JsonConvert.DeserializeObject data.Data :?> JArray
-                let channel = event.[0].Value<string>()
-                let sequence = event.[1].Value<int64>()
-                let eventType = event.[2].Value<int>()
-                let stamp = event.[3]
-                let payload = event.[4]
-                let user = event.[5].Value<string>()
-                let event = deserializeEvent sequence eventType stamp payload user
-                match handlers.TryGetValue channel with
-                | true, handler -> handler.Post event
-                | _ -> ()
-            with
-            | ex -> printfn "[Channel] Message error: %s" (ex.ToString())
-        )
+    let rec init () =
+        lock mutex (fun _ ->
+            if !webSocket = None then
+                let client = new WebSocket(Api.channelServer, Compression = CompressionMethod.DEFLATE)
+                webSocket := Some client
 
-        printfn "[Channel] Opening websocket connection %s" Api.channelServer
+                client.OnMessage.Add (fun data -> 
+                    try
+                        let event = JsonConvert.DeserializeObject data.Data :?> JArray
+                        let channel = event.[0].Value<string>()
+                        let nextSequence = event.[1].Value<int64>()
+                        let eventType = event.[2].Value<int>()
+                        let stamp = event.[3]
+                        let payload = event.[4]
+                        let user = event.[5].Value<string>()
+                        let event = deserializeEvent nextSequence eventType stamp payload user
+                        sequence := nextSequence
+                        match handlers.TryGetValue channel with
+                        | true, handler -> handler.Post event
+                        | _ -> ()
+                    with
+                    | ex -> printfn "[Channel] Message error: %s" (ex.ToString())
+                )
 
-        client.ConnectAsync()
+                Async.Start <| async {
 
-        client.OnOpen.Add (fun _ ->
-            client.Send("auth=" + Api.userToken)
-            client.Send("seq=" + sequence.ToString())
-            printfn "[Channel] Connection open"
-        )
+                    printfn "[Channel] Opening websocket connection %s" Api.channelServer
+                    client.Connect()
+                    client.Send("auth=" + Api.userToken)
+                    client.Send("seq=" + (!sequence).ToString())
+                    printfn "[Channel] Connection open"
 
-        client.OnError.Add (fun e ->
-            printfn "[Channel] Websocket error: %s" e.Message
-            client.CloseAsync ()
-            webSocket <- None
-            init ()
-        )
+                    client.OnError.Add (fun e ->
+                        printfn "[Channel] Websocket error: %s" e.Message
+                        client.CloseAsync ()
+                        webSocket := None
+                        init ()
+                    )
 
-        client.OnClose.Add (fun e ->
-            printfn "[Channel] Websocket closed: %s" e.Reason
-            webSocket <- None
-            init ()
-        )
+                    client.OnClose.Add (fun e ->
+                        printfn "[Channel] Websocket closed: %s" e.Reason
+                        webSocket := None
+                        init ()
+                    )
+                }
+            )
+    init
