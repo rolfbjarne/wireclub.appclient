@@ -88,9 +88,7 @@ let deserializeEvents (payload:JArray) =
             deserializeEventList (channelMessages.[1])
     |]) else [| |]
 
-let handlers = ConcurrentDictionary<string, MailboxProcessor<ChannelEvent>>()
-
-let init = 
+let init handler = 
     let mutex = obj()
     let sequence = ref 0L
     let (webSocket:Ref<WebSocket option>) = ref None
@@ -112,9 +110,7 @@ let init =
                         let user = event.[5].Value<string>()
                         let event = deserializeEvent nextSequence eventType stamp payload user
                         sequence := nextSequence
-                        match handlers.TryGetValue channel with
-                        | true, handler -> handler.Post event
-                        | _ -> ()
+                        handler event
                     with
                     | ex -> printfn "[Channel] Message error: %s" (ex.ToString())
                 )
