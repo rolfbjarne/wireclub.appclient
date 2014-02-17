@@ -37,5 +37,6 @@ type ChannelEventType =
 type ChannelEvent = {
     Sequence: int64
     User: string
+    Channel: string
     Event: ChannelEventType
 }

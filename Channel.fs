@@ -31,10 +31,11 @@ let deserializeUser (payload:JToken) =
         Membership = payload.[12].Value<string>()
     }
 
-let deserializeEvent sequence eventType stamp (payload:JToken) user =
+let deserializeEvent sequence eventType stamp (payload:JToken) user channel =
     { 
         Sequence = sequence
         User = user
+        Channel = channel
         Event = 
             match eventType with
             | 0 -> Notification (payload.Value<string>())
@@ -68,24 +69,25 @@ let deserializeEvent sequence eventType stamp (payload:JToken) user =
             | _ -> Unknown
     }
 
-let deserializeEventToken (event:JToken) =
-    let sequence = event.[0].Value<int64>()
-    let eventType = event.[1].Value<int>()
-    let stamp = event.[2]
-    let payload = event.[3]
-    let user = event.[4].Value<string>()
-    deserializeEvent sequence eventType stamp payload user
+let deserializeEventList (events:JToken) channel =
+    events
+    |> Seq.map (fun event -> 
+        let sequence = event.[0].Value<int64>()
+        let eventType = event.[1].Value<int>()
+        let stamp = event.[2]
+        let payload = event.[3]
+        let user = event.[4].Value<string>()
+        deserializeEvent sequence eventType stamp payload user channel
+    )
+    |> Seq.toArray
 
-let deserializeEventList (events:JToken) =
-    events |> Seq.map deserializeEventToken |> Seq.toArray
-
-let deserializeEvents (payload:JArray) =
+let deserializeEvents (payload:JArray) channel =
     payload.[0].Value<int64>(),
     if payload.Count > 1 then (
         [|
         for channelMessages in (payload.[1]) ->
             channelMessages.[0].Value<string>(),
-            deserializeEventList (channelMessages.[1])
+            deserializeEventList (channelMessages.[1]) channel
     |]) else [| |]
 
 let init = 
@@ -108,7 +110,7 @@ let init =
                         let stamp = event.[3]
                         let payload = event.[4]
                         let user = event.[5].Value<string>()
-                        let event = deserializeEvent nextSequence eventType stamp payload user
+                        let event = deserializeEvent nextSequence eventType stamp payload user channel
                         sequence := nextSequence
                         handler event
                     with
