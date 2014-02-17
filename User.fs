@@ -14,13 +14,14 @@ let addFriend slug =
 let removeFriend slug =
     Api.post<unit> (sprintf "users/%s/removeFriend" slug)
 
-let fetch id = 
+let fetch (ids:string list) = 
     //TODO Make this return an actual user
     async {
         let! account = Account.identity()
         return
             match account with
-            | Api.ApiOk account -> Api.ApiOk { account with Id = id }
+            | Api.ApiOk account ->
+                Api.ApiOk (  [ for id in ids do yield  { account with Id = id } ] )
             | error -> Api.Exception (new Exception())
     }
    
