@@ -10,6 +10,7 @@ let handleLogin result =
     | Api.ApiOk result ->
         Api.client.DefaultRequestHeaders.TryAddWithoutValidation("x-csrf-token", result.Csrf) |> ignore
         Api.userId <- result.Identity.Id
+        Api.userIdentity <- Some result.Identity
         Api.userCsrf <- result.Csrf
         Api.userToken <- result.Token
         Api.ApiOk result

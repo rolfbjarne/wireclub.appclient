@@ -39,7 +39,7 @@ let tokenEncode (input:string) =
     System.String.Concat (chArray)
     
 let imageUrl (imageId:string) size = 
-    match imageId.Split '/' with
+    match imageId.Replace("/images", "").Trim('/').Split('/') with
     | [| imageId; dimensions |] ->
         match (tokenDecode dimensions).Split ',' with
         | [| width; height; hash |] ->

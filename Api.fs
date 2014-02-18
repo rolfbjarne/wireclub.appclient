@@ -30,6 +30,7 @@ client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue(
 
 let debugSlowNetwork = false
 
+let mutable userIdentity: Wireclub.Boundary.Models.User option = None
 let mutable userId = ""
 let mutable userToken = ""
 let mutable userCsrf = ""
