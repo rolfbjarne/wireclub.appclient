@@ -112,7 +112,7 @@ let init =
                         let user = event.[5].Value<string>()
                         let event = deserializeEvent nextSequence eventType stamp payload user channel
                         sequence := nextSequence
-                        handler event
+                        handler channel event
                     with
                     | ex -> printfn "[Channel] Message error: %s" (ex.ToString())
                 )
