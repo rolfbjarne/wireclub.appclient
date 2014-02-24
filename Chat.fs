@@ -1,4 +1,4 @@
-﻿
+﻿    
 module Chat
 
 open System
@@ -16,8 +16,7 @@ let join slug = async {
             | Api.ApiOk result ->
                 try
                     let events = 
-                        JsonConvert.DeserializeObject result.Events :?> JToken
-                        |> ChannelClient.deserializeEventList
+                        ChannelClient.deserializeEventList (JsonConvert.DeserializeObject result.Events :?> JToken) result.Channel.Id
 
                     Api.ApiOk (result, events)
                 with
