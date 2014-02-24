@@ -3,6 +3,7 @@
 open System
 open System.Net
 open System.Net.Http
+open System.Net.Http.Headers
 open System.Threading.Tasks
 open System.Collections.Generic
 open System.Diagnostics
@@ -45,9 +46,9 @@ staticBaseUrl <- "http://192.168.0.102"
 channelServer <- "ws://192.168.0.102:8888/events"
 #endif
 #if __IOS__
-baseUrl <- "http://192.168.0.101"
-staticBaseUrl <- "http://192.168.0.101"
-channelServer <- "ws://192.168.0.101:8888/events"
+baseUrl <- "http://192.168.0.102"
+staticBaseUrl <- "http://192.168.0.102"
+channelServer <- "ws://192.168.0.102:8888/events"
 #endif
 
 type ApiResult<'A> =
@@ -66,6 +67,38 @@ let fullUrl (url:string) =
     match url.Contains("://") with
     | true -> url
     | false -> Uri(Uri(baseUrl), url).ToString()
+
+let respParse<'A> (resp:HttpResponseMessage) = async {
+    let stringContent () = 
+            Async.AwaitTask (resp.Content.ReadAsStringAsync())
+
+    match int resp.StatusCode with
+    | 200 when typeof<'A> = typeof<byte[]> -> 
+        let! content = Async.AwaitTask (resp.Content.ReadAsByteArrayAsync ())
+        return ApiOk (content :> obj :?> 'A)
+    | 200 when typeof<'A> = typeof<string> -> 
+        let! content = stringContent ()
+        return ApiOk (content :> obj :?> 'A)
+    | 200 when typeof<'A> = typeof<unit> ->
+        return ApiOk (() :> obj :?> 'A)
+    | 200 ->
+        let! content = stringContent ()
+        try
+            return ApiOk (JsonConvert.DeserializeObject<'A>(content))
+        with
+        | ex -> return Deserialization (ex, content)
+    | 400 -> 
+        let! content = stringContent ()
+        try
+            return BadRequest (JsonConvert.DeserializeObject<ApiError[]>(content) |> List.ofArray)
+        with
+        | ex -> return Deserialization (ex, content)
+    | 401
+    | 403 -> return Unauthorized
+    | status -> 
+        let! content = stringContent ()
+        return HttpError (status, content)
+}
 
 let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = async {
     try
@@ -88,38 +121,40 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
 
         printfn "HTTP:%s %s %i %ims" httpMethod url (int resp.StatusCode) (stopwatch.ElapsedMilliseconds)
 
-        let stringContent () = 
-            Async.AwaitTask (resp.Content.ReadAsStringAsync())
-
-        match int resp.StatusCode with
-        | 200 when typeof<'A> = typeof<byte[]> -> 
-            let! content = Async.AwaitTask (resp.Content.ReadAsByteArrayAsync ())
-            return ApiOk (content :> obj :?> 'A)
-        | 200 when typeof<'A> = typeof<string> -> 
-            let! content = stringContent ()
-            return ApiOk (content :> obj :?> 'A)
-        | 200 when typeof<'A> = typeof<unit> ->
-            return ApiOk (() :> obj :?> 'A)
-        | 200 ->
-            let! content = stringContent ()
-            try
-                return ApiOk (JsonConvert.DeserializeObject<'A>(content))
-            with
-            | ex -> return Deserialization (ex, content)
-        | 400 -> 
-            let! content = stringContent ()
-            try
-                return BadRequest (JsonConvert.DeserializeObject<ApiError[]>(content) |> List.ofArray)
-            with
-            | ex -> return Deserialization (ex, content)
-        | 401
-        | 403 -> return Unauthorized
-        | status -> 
-            let! content = stringContent ()
-            return HttpError (status, content)
+        let! resp = respParse<'A> resp
+        return resp
     with
     | ex -> return Exception ex
 }
 
 let post<'A> url = req<'A> url "POST" []
 let get<'A> url = req<'A> url "GET" []
+
+let upload<'A> url name filename (data:byte []) =  async {
+    try
+        let stopwatch = Stopwatch()
+        stopwatch.Start()
+
+        let url = fullUrl url
+
+        let content = new MultipartFormDataContent()
+        let fileContent = new ByteArrayContent(data)
+        fileContent.Headers.ContentType <- MediaTypeHeaderValue.Parse("multipart/form-data")
+        fileContent.Headers.ContentDisposition <- new ContentDispositionHeaderValue("attachment", FileName = filename, Name = name)
+
+        content.Add(fileContent)
+        let task = client.PostAsync(url, content)
+
+        let! resp = Async.AwaitTask task
+        do! (awaitTask (resp.Content.LoadIntoBufferAsync()))
+
+        printfn "HTTP:%s %s %i %ims" "POST" url (int resp.StatusCode) (stopwatch.ElapsedMilliseconds)
+
+        let! resp = respParse<'A> resp
+        return resp
+    with
+    | ex -> return Exception ex
+}
+
+
+
