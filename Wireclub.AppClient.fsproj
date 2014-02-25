@@ -63,10 +63,16 @@
     <Compile Include="App.fs" />
     <Compile Include="Chat.fs" />
     <Compile Include="PrivateChat.fs" />
+    <Compile Include="Places.fs" />
     <Compile Include="Routes.fs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\websocket-sharp\websocket-sharp\websocket-sharp.csproj">
+      <Name>websocket-sharp</Name>
+      <Project>{b357bac7-529e-4d81-a0d2-71041b19c8de}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
