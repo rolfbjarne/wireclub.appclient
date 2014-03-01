@@ -56,14 +56,12 @@
     <None Include="Test/Protobuf.fsx" />
     <Compile Include="Api.fs" />
     <Compile Include="Account.fs" />
-    <Compile Include="Profile.fs" />
     <Compile Include="Settings.fs" />
     <Compile Include="ChannelEvent.fs" />
     <Compile Include="Channel.fs" />
     <Compile Include="App.fs" />
     <Compile Include="Chat.fs" />
     <Compile Include="PrivateChat.fs" />
-    <Compile Include="Places.fs" />
     <Compile Include="Routes.fs" />
     <None Include="packages.config" />
   </ItemGroup>

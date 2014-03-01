@@ -2,6 +2,7 @@
 
 open System
 open Wireclub.Models
+open Wireclub.Boundary.Models
 
 let changeUsername () =
     ()
@@ -9,17 +10,26 @@ let changeUsername () =
 let changePassword () =
     ()
 
-let profile userId (birthday:DateTime) (gender:GenderType) city firstname lastname (useRealName:bool) bio =
-    Api.req<string> "settings/doProfile" "POST" [
-        "userId", userId
-        "birthday", birthday.ToString()
-        "city", city
-        "firstname", firstname
-        "lastname", lastname
-        "userRealName", (useRealName.ToString())
-        "gender", (int gender).ToString()
-        "bio", bio
-    ]
+let avatar data =
+    Api.upload<Image> "settings/doAvatar" "avatar" "avatar.jpg" data
 
-let avatar () =
-    ()
+let profile username (gender:GenderType) (birthday:DateTime) country region city bio =
+    Api.req<User> "api/settings/profile" "post" 
+        [
+            "userId", Api.userId
+            "username", username
+            "gender", string gender
+            "birthday-year", string birthday.Year
+            "birthday-month", string birthday.Month
+            "birthday-day", string birthday.Day
+            "bio", bio
+            "country", country
+            "region", region
+            "city", city
+        ]
+
+let countries () =
+    Api.req<LocationCountry[]> "api/settings/countries" "post" []
+
+let regions country =
+    Api.req<LocationRegion[]> "api/settings/regions" "post" [ "country", country ]
