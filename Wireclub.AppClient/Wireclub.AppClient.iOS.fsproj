@@ -65,10 +65,8 @@
     <Compile Include="Channel.fs" />
     <Compile Include="Chat.fs" />
     <Compile Include="PrivateChat.fs" />
-    <Compile Include="Profile.fs" />
     <Compile Include="Routes.fs" />
     <Compile Include="Settings.fs" />
     <Compile Include="User.fs" />
-    <Compile Include="Places.fs" />
   </ItemGroup>
 </Project>
