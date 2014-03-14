@@ -1,6 +1,7 @@
 ﻿module User
 
 open System
+open Wireclub.Boundary.Models
 
 let block slug =
     Api.post<unit> (sprintf "users/%s/block" slug)
@@ -24,4 +25,8 @@ let fetch (ids:string list) =
                 Api.ApiOk (  [ for id in ids do yield  { account with Id = id } ] )
             | error -> Api.Exception (new Exception())
     }
+    
+let entityBySlug slug =
+    Api.req<Entity> ("/users/" + slug + "/entityData") "get" [ ]
+
    

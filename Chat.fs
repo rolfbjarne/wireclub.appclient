@@ -2,6 +2,7 @@
 module Chat
 
 open System
+open Wireclub.Boundary.Models
 open Wireclub.Boundary.Chat
 open Newtonsoft.Json
 open Newtonsoft.Json.Linq
@@ -33,6 +34,9 @@ let send slug line =
     Api.req<ChannelPostResult> ("/chat/room/" + slug + "/send2") "post" [
         "line", line
     ]
+
+let entityBySlug slug =
+    Api.req<Entity> ("/chat/room/" + slug + "/entityData") "get" [ ]
 
 let acceptDrink () =
     ()
