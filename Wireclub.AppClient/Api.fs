@@ -119,7 +119,7 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
         let! resp = Async.AwaitTask task
         do! (awaitTask (resp.Content.LoadIntoBufferAsync()))
 
-        printfn "HTTP:%s %s %i %ims" httpMethod url (int resp.StatusCode) (stopwatch.ElapsedMilliseconds)
+        printfn "[API] %s %s %i %ims" httpMethod url (int resp.StatusCode) (stopwatch.ElapsedMilliseconds)
 
         let! resp = respParse<'A> resp
         return resp
@@ -148,7 +148,7 @@ let upload<'A> url name filename (data:byte []) =  async {
         let! resp = Async.AwaitTask task
         do! (awaitTask (resp.Content.LoadIntoBufferAsync()))
 
-        printfn "HTTP:%s %s %i %ims" "POST" url (int resp.StatusCode) (stopwatch.ElapsedMilliseconds)
+        printfn "[API] %s %s %i %ims" "POST" url (int resp.StatusCode) (stopwatch.ElapsedMilliseconds)
 
         let! resp = respParse<'A> resp
         return resp
