@@ -6,6 +6,7 @@ open System.Net.Http
 open Newtonsoft.Json
 open Newtonsoft.Json.Linq
 open ChannelEvent
+open Wireclub.Models
 open Wireclub.Boundary.Models
 open Wireclub.Boundary
 open Wireclub.Boundary.Chat
@@ -28,7 +29,7 @@ let deserializeUser (payload:JToken) =
         Age = payload.[9].Value<int>()
         Location = payload.[10].Value<string>()
         Url = payload.[11].Value<string>()
-        Membership = payload.[12].Value<string>()
+        Membership = enum<MembershipTypePublic>(payload.[12].Value<int>())
     }
 
 let deserializeEvent sequence eventType stamp (payload:JToken) user channel =
