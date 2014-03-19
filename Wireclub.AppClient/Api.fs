@@ -40,6 +40,7 @@ let mutable baseUrl = "http://www.wireclub.com"
 let mutable staticBaseUrl = "http://static.wireclub.com"
 let mutable channelServer = "ws://chat.wireclub.com:8888/events"
 
+#if DEBUG
 #if __ANDROID__
 baseUrl <- "http://192.168.0.102"
 staticBaseUrl <- "http://192.168.0.102"
@@ -49,6 +50,7 @@ channelServer <- "ws://192.168.0.102:8888/events"
 baseUrl <- "http://192.168.0.102"
 staticBaseUrl <- "http://192.168.0.102"
 channelServer <- "ws://192.168.0.102:8888/events"
+#endif
 #endif
 
 type ApiResult<'A> =
