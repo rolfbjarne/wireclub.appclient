@@ -1,4 +1,4 @@
-﻿module Places
+﻿module Settings
 
 open System
 open Helpers
@@ -62,6 +62,21 @@ let ``Fetch Notifications`` () =
 [<Test>]
 let ``Update Notifications`` () =
     Settings.suppressNotifications [ "AlertMessage"; "AlertInvitedToEntity" ]
+    |> run
+    |> assertApiResult
+    |> ignore
+
+
+[<Test>]
+let ``Fetch Chat Options`` () =
+    Settings.chat ()
+    |> run
+    |> assertApiResult
+    |> ignore
+
+[<Test>]
+let ``Update Chat Options`` () =
+    Settings.updateChat 0 3 false 1
     |> run
     |> assertApiResult
     |> ignore

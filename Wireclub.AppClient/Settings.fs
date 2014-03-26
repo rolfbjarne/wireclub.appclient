@@ -46,3 +46,9 @@ let notifications () =
 
 let suppressNotifications (notifications:string list) =
     Api.req<PasswordChangeFormData> "settings/notifications" "post" (( "status", "true" ) :: (notifications |> List.map (fun notification -> "notifications", notification)))
+
+let chat () =
+    Api.req<ChatOptionsFormData> "api/settings/chat" "get" []
+
+let updateChat (font:int) (color:int) (sounds:bool) (joinLeave:int) =
+    Api.req<ChatOptionsFormData> "chat/options" "post" [ "font", string font ; "colorId", string color ; "playSounds", string sounds ; "joinLeaveMessages", string joinLeave ; ]
