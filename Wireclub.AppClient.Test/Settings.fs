@@ -80,3 +80,27 @@ let ``Update Chat Options`` () =
     |> run
     |> assertApiResult
     |> ignore
+
+[<Test>]
+let ``Fetch Privacy`` () =
+    Settings.privacy ()
+    |> run
+    |> assertApiResult
+    |> ignore
+
+[<Test>]
+let ``Update Privacy`` () =
+    Settings.updatePrivacy         
+        RelationshipRequiredType.Anyone
+        RelationshipRequiredType.Anyone
+        RelationshipRequiredType.Anyone
+        RelationshipRequiredType.Anyone
+        RelationshipRequiredType.Anyone
+        RelationshipRequiredType.Anyone
+        RelationshipRequiredType.Anyone
+        RelationshipRequiredType.Anyone
+        RelationshipRequiredType.Anyone
+        false
+    |> run
+    |> assertApiResult
+    |> ignore
