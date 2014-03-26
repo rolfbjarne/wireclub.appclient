@@ -51,3 +51,17 @@ let ``Update Password`` () =
     |> run
     |> assertApiResult
     |> ignore
+
+[<Test>]
+let ``Fetch Notifications`` () =
+    Settings.notifications ()
+    |> run
+    |> assertApiResult
+    |> ignore
+
+[<Test>]
+let ``Update Notifications`` () =
+    Settings.suppressNotifications [ "AlertMessage"; "AlertInvitedToEntity" ]
+    |> run
+    |> assertApiResult
+    |> ignore

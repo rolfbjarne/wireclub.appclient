@@ -40,3 +40,9 @@ let email email confirmation password =
 
 let password currentPassword password confirmation =
     Api.req<PasswordChangeFormData> "settings/doPassword" "post" [ "currentPassword", currentPassword; "password", password; "confirmation", confirmation ]
+
+let notifications () =
+    Api.req<PasswordChangeFormData> "api/settings/notifications" "get" []
+
+let suppressNotifications (notifications:string list) =
+    Api.req<PasswordChangeFormData> "settings/notifications" "post" (( "status", "true" ) :: (notifications |> List.map (fun notification -> "notifications", notification)))
