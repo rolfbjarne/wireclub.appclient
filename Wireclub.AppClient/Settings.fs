@@ -34,6 +34,9 @@ let countries () =
 
 let regions country =
     Api.req<LocationRegion[]> "api/settings/regions" "post" [ "country", country ]
-
+    
 let email email confirmation password =
     Api.req<EmailFormData> "settings/doEmail" "post" [ "email", email; "confirmation", confirmation; "password", password ]
+
+let password currentPassword password confirmation =
+    Api.req<PasswordChangeFormData> "settings/doPassword" "post" [ "currentPassword", currentPassword; "password", password; "confirmation", confirmation ]

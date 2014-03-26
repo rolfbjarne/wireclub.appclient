@@ -44,3 +44,10 @@ let ``Update Email`` () =
     |> run
     |> assertApiResult
     |> ignore
+
+[<Test>]
+let ``Update Password`` () =
+    Settings.password Helpers.password Helpers.password Helpers.password
+    |> run
+    |> assertApiResult
+    |> ignore
