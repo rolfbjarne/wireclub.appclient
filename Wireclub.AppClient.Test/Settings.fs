@@ -37,3 +37,10 @@ let ``Fetch Regions`` () =
 
     printfn "%A" regions
     ()
+
+[<Test>]
+let ``Update Email`` () =
+    Settings.email Helpers.email Helpers.email Helpers.password
+    |> run
+    |> assertApiResult
+    |> ignore
