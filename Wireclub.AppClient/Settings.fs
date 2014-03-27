@@ -42,10 +42,10 @@ let password currentPassword password confirmation =
     Api.req<PasswordChangeFormData> "settings/doPassword" "post" [ "currentPassword", currentPassword; "password", password; "confirmation", confirmation ]
 
 let notifications () =
-    Api.req<PasswordChangeFormData> "api/settings/notifications" "get" []
+    Api.req<NotificationsFormData> "api/settings/notifications" "get" []
 
 let suppressNotifications (notifications:string list) =
-    Api.req<PasswordChangeFormData> "settings/notifications" "post" (( "status", "true" ) :: (notifications |> List.map (fun notification -> "notifications", notification)))
+    Api.req<obj> "settings/notifications" "post" (( "status", "true" ) :: (notifications |> List.map (fun notification -> "notifications", notification)))
 
 let chat () =
     Api.req<ChatOptionsFormData> "api/settings/chat" "get" []
@@ -75,13 +75,13 @@ let updatePrivacy contact privateChat viewProfile viewBlog viewPictures viewConv
         ]
 
 let messaging () =
-    Api.req<ChatOptionsFormData> "api/settings/messaging" "get" []
+    Api.req<MessagingFormData> "api/settings/messaging" "get" []
     
 let updateMessaging (picture:bool) (profile:bool) (verifiedEmail:bool) =
-    Api.req<EmailFormData> "settings/doMessaging" "post" [ "blockWithoutPicture", string picture; "blockWithoutProfile", string profile; "blockWithoutVerifiedEmail", string verifiedEmail ]
+    Api.req<MessagingFormData> "settings/doMessaging" "post" [ "blockWithoutPicture", string picture; "blockWithoutProfile", string profile; "blockWithoutVerifiedEmail", string verifiedEmail ]
 
 let blocked () =
-    Api.req<PasswordChangeFormData> "api/settings/blocked" "get" []
+    Api.req<BlockedFormData> "api/settings/blocked" "get" []
 
 let unblock (ids:string list) =
-    Api.req<PasswordChangeFormData> "api/settings/unblock" "post"  (ids |> List.map (fun notification -> "ids", notification))
+    Api.req<BlockedFormData> "api/settings/unblock" "post"  (ids |> List.map (fun notification -> "ids", notification))
