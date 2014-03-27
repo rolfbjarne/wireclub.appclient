@@ -45,7 +45,7 @@ let notifications () =
     Api.req<NotificationsFormData> "api/settings/notifications" "get" []
 
 let suppressNotifications (notifications:string list) =
-    Api.req<obj> "settings/notifications" "post" (( "status", "true" ) :: (notifications |> List.map (fun notification -> "notifications", notification)))
+    Api.req<NotificationsFormData> "settings/notifications" "post" (( "status", "true" ) :: (notifications |> List.map (fun notification -> "notifications", notification)))
 
 let chat () =
     Api.req<ChatOptionsFormData> "api/settings/chat" "get" []
