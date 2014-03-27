@@ -79,3 +79,9 @@ let messaging () =
     
 let updateMessaging (picture:bool) (profile:bool) (verifiedEmail:bool) =
     Api.req<EmailFormData> "settings/doMessaging" "post" [ "blockWithoutPicture", string picture; "blockWithoutProfile", string profile; "blockWithoutVerifiedEmail", string verifiedEmail ]
+
+let blocked () =
+    Api.req<PasswordChangeFormData> "api/settings/blocked" "get" []
+
+let unblock (ids:string list) =
+    Api.req<PasswordChangeFormData> "api/settings/unblock" "post"  (ids |> List.map (fun notification -> "ids", notification))

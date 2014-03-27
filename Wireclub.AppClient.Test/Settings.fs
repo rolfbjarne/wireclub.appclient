@@ -118,3 +118,18 @@ let ``Update Messaging`` () =
     |> run
     |> assertApiResult
     |> ignore
+
+
+[<Test>]
+let ``Fetch Blocks`` () =
+    Settings.blocked ()
+    |> run
+    |> assertApiResult
+    |> ignore
+
+[<Test>]
+let ``Unblock`` () =
+    Settings.unblock [ "AAAAAAAAAAAANj7F0" ; "AAAAAAAAAAAAHu8O0" ]
+    |> run
+    |> assertApiResult
+    |> ignore
