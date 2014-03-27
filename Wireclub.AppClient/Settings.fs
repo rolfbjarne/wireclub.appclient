@@ -54,12 +54,12 @@ let updateChat (font:int) (color:int) (sounds:bool) (joinLeave:int) =
     Api.req<ChatOptionsFormData> "chat/options" "post" [ "font", string font ; "colorId", string color ; "playSounds", string sounds ; "joinLeaveMessages", string joinLeave ; ]
 
 let privacy () =
-    Api.req<ChatOptionsFormData> "api/settings/privacy" "get" []
+    Api.req<PrivacyFormData> "api/settings/privacy" "get" []
 
 let updatePrivacy contact privateChat viewProfile viewBlog viewPictures viewConversations commentProfile commentBlock gameChallenge (optOut:bool) =
     let relToString (rel:RelationshipRequiredType) = rel |> int |> string 
-    Api.req<ChatOptionsFormData>
-        "chat/options"
+    Api.req<PrivacyFormData>
+        "settings/doPrivacy"
         "post"
         [
             "requiredRelationshipToContact", relToString contact
@@ -73,3 +73,9 @@ let updatePrivacy contact privateChat viewProfile viewBlog viewPictures viewConv
             "requiredRelationshipToGameChallenge", relToString gameChallenge
             "optOutFromRatePictures", string optOut
         ]
+
+let messaging () =
+    Api.req<ChatOptionsFormData> "api/settings/messaging" "get" []
+    
+let updateMessaging (picture:bool) (profile:bool) (verifiedEmail:bool) =
+    Api.req<EmailFormData> "settings/doMessaging" "post" [ "blockWithoutPicture", string picture; "blockWithoutProfile", string profile; "blockWithoutVerifiedEmail", string verifiedEmail ]

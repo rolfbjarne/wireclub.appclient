@@ -104,3 +104,17 @@ let ``Update Privacy`` () =
     |> run
     |> assertApiResult
     |> ignore
+
+[<Test>]
+let ``Fetch Messaging`` () =
+    Settings.messaging ()
+    |> run
+    |> assertApiResult
+    |> ignore
+
+[<Test>]
+let ``Update Messaging`` () =
+    Settings.updateMessaging true true true
+    |> run
+    |> assertApiResult
+    |> ignore
