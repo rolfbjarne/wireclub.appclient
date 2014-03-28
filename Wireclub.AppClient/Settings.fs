@@ -5,12 +5,6 @@ open Wireclub.Models
 open Wireclub.Boundary.Models
 open Wireclub.Boundary.Settings
 
-let changeUsername () =
-    ()
-
-let changePassword () =
-    ()
-
 let avatar data =
     Api.upload<Image> "settings/doAvatar" "avatar" "avatar.jpg" data
 
