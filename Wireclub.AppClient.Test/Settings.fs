@@ -13,7 +13,7 @@ let setup () =
 
 [<Test>]
 let ``Update Profile`` () =
-    Settings.profile username GenderType.Male  (DateTime.UtcNow.AddYears(-30)) "ca" "British Columbia" "Surrey" "A little about myself"
+    Settings.updateProfile username GenderType.Male  (DateTime.UtcNow.AddYears(-30)) "ca" "British Columbia" "Surrey" "A little about myself"
     |> run
     |> assertApiResult
     |> ignore
@@ -130,6 +130,14 @@ let ``Fetch Blocks`` () =
 [<Test>]
 let ``Unblock`` () =
     Settings.unblock [ "AAAAAAAAAAAANj7F0" ; "AAAAAAAAAAAAHu8O0" ]
+    |> run
+    |> assertApiResult
+    |> ignore
+
+    
+[<Test>]
+let ``Fetch Profile`` () =
+    Settings.profile ()
     |> run
     |> assertApiResult
     |> ignore

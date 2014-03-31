@@ -7,8 +7,11 @@ open Wireclub.Boundary.Settings
 
 let avatar data =
     Api.upload<Image> "settings/doAvatar" "avatar" "avatar.jpg" data
+    
+let profile () =
+    Api.req<ProfileFormData> "api/settings/profile" "get" []
 
-let profile username (gender:GenderType) (birthday:DateTime) country region city bio =
+let updateProfile username (gender:GenderType) (birthday:DateTime) country region city bio =
     Api.req<User> "api/settings/profile" "post" 
         [
             "userId", Api.userId
