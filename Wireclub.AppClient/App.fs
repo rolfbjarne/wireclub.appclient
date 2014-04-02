@@ -51,3 +51,6 @@ let imageUrl (imageId:string) size =
 let fetchActiveChannels () =
     Api.req<Wireclub.Boundary.Chat.ChatRoomDataViewModel> "home/fetchActiveChannels"
 
+let reportErrors (errors:string list) =
+    Api.req<obj> "api/diagnostics/reportError" "post" [ for error in errors do yield "error", error ]
+
