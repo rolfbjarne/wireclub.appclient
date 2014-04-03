@@ -16,6 +16,14 @@ let handleLogin result =
         Api.ApiOk result
     | resp -> resp
 
+let logout () =
+    for cookie in Api.handler.CookieContainer.GetCookies(new Uri(Api.baseUrl)) do
+        cookie.Expires <- DateTime.UtcNow.AddHours(-1.0)
+    Api.userId <- null
+    Api.userIdentity <- None
+    Api.userCsrf <- null
+    Api.userToken <- null
+
 let login username password = async {
     let! resp = 
         Api.req<LoginResult> "account/doLogin" "post" (
@@ -58,13 +66,6 @@ let signup email password = async {
     return handleLogin result
 }
 
-let logout () =
-    Api.userId <- ""
-    Api.userToken <- ""
-    Api.userCsrf <- ""
-    for cookie in Api.handler.CookieContainer.GetCookies(new Uri(Api.baseUrl)) do
-        cookie.Expires <- DateTime.UtcNow.AddHours(-1.0)
-    
 let resetPassword email = 
     Api.req<string> "account/doPasswordResetRequest" "post" 
         [
