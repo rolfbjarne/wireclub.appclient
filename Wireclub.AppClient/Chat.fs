@@ -27,6 +27,9 @@ let join slug = async {
         return resp
     }
 
+let keepAlive slug =
+    Api.req<unit> ("/api/chat/keepAlive/" + slug) "post" [ ]
+
 let leave slug =
     Api.req<string> ("/chat/room/" + slug + "/leave") "post" [ ]
 
@@ -38,17 +41,13 @@ let send slug line =
 let entityBySlug slug =
     Api.req<Entity> ("/chat/room/" + slug + "/entityData") "get" [ ]
 
-let acceptDrink () =
-    ()
+let acceptDrink () = ()
 
-let rejectDrink () =
-    ()
+let rejectDrink () = ()
 
-let report () =
-    ()
+let report () = ()
 
-let getAd () =
-    ()
+let getAd () = ()
 
 let changePreferences (font:int) (color:int) =
     Api.req<unit> "chat/changePreferences" "post" [

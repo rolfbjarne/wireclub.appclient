@@ -31,3 +31,11 @@ let Join () =
     |> run
     |> assertApiResult
     |> printfn "%A"
+
+    
+[<Test>]
+let ``Keep Alive`` () =
+    Chat.keepAlive "private_chat_lobby"
+    |> run
+    |> assertApiResult
+    |> printfn "%A"
