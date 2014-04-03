@@ -91,14 +91,15 @@ let deserializeEvents (payload:JArray) channel =
             deserializeEventList (channelMessages.[1]) channel
     |]) else [| |]
 
-let init = 
-    let mutex = obj()
-    let sequence = ref 0L
-    let (webSocket:Ref<WebSocket option>) = ref None
 
+let mutex = obj()
+let sequence = ref 0L
+let (webSocket:Ref<WebSocket option>) = ref None
+
+let init = 
     let rec init handler =
         lock mutex (fun _ ->
-            if !webSocket = None then
+            if !webSocket = None && Api.userToken <> null then
                 let client = new WebSocket(Api.channelServer, Compression = CompressionMethod.DEFLATE)
                 webSocket := Some client
 
@@ -141,3 +142,10 @@ let init =
                 }
             )
     init
+
+let close () =
+    lock mutex (fun _ ->
+        match !webSocket with
+        | Some client -> client.CloseAsync()
+        | _-> ()
+    )
