@@ -45,3 +45,10 @@ let ``Session`` () =
     |> run
     |> assertApiResult
     |> ignore
+
+[<Test>]
+let ``Change Online State`` () =
+    PrivateChat.changeOnlineState OnlineStateType.Idle
+    |> run
+    |> assertApiResult
+    |> ignore
