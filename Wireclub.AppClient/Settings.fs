@@ -82,3 +82,6 @@ let blocked () =
 
 let unblock (ids:string list) =
     Api.req<BlockedFormData> "api/settings/unblock" "post"  (ids |> List.map (fun notification -> "ids", notification))
+
+let updateContentOptions (showRatedR:bool) =
+    Api.req<obj> "/chat/doContentRatingOptions" "post"  [ "showRatingR", string showRatedR ]

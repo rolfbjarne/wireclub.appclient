@@ -141,3 +141,10 @@ let ``Fetch Profile`` () =
     |> run
     |> assertApiResult
     |> ignore
+
+[<Test>]
+let ``Update Content Rating`` () =
+    Settings.updateContentOptions true
+    |> run
+    |> assertApiResult
+    |> ignore
