@@ -1,4 +1,6 @@
-﻿module ChannelClient
+// Copyright (c) Wireclub Media Inc. All Rights Reserved. See License.md in the project root for license information.
+
+module ChannelClient
 
 open System
 open System.Collections.Concurrent

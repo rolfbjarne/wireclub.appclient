@@ -1,4 +1,6 @@
-﻿module PrivateChat
+// Copyright (c) Wireclub Media Inc. All Rights Reserved. See License.md in the project root for license information.
+
+module PrivateChat
 
 open Newtonsoft.Json
 open Wireclub.Models

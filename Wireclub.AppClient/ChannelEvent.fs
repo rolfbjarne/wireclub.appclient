@@ -1,4 +1,6 @@
-﻿module ChannelEvent
+// Copyright (c) Wireclub Media Inc. All Rights Reserved. See License.md in the project root for license information.
+
+module ChannelEvent
 
 open Wireclub.Boundary.Chat
 

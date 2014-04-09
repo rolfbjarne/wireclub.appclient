@@ -1,4 +1,6 @@
-﻿module ChatTests
+// Copyright (c) Wireclub Media Inc. All Rights Reserved. See License.md in the project root for license information.
+
+module ChatTests
 
 open Helpers
 open NUnit.Framework
