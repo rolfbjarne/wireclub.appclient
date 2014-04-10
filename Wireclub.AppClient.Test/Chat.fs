@@ -41,3 +41,17 @@ let ``Keep Alive`` () =
     |> run
     |> assertApiResult
     |> printfn "%A"
+
+[<Test>]
+let Star () =
+    Chat.star "private_chat_lobby"
+    |> run
+    |> assertApiResult
+    |> printfn "%A"
+
+[<Test>]
+let Unstar () =
+    Chat.unstar "private_chat_lobby"
+    |> run
+    |> assertApiResult
+    |> printfn "%A"

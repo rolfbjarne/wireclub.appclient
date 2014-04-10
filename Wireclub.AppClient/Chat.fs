@@ -43,9 +43,11 @@ let send slug line =
 let entityBySlug slug =
     Api.req<Entity> ("/chat/room/" + slug + "/entityData") "get" [ ]
 
-let acceptDrink () = ()
+let star slug = 
+    Api.req<bool> ("/chat/room/" + slug + "/star") "post" [ ]
 
-let rejectDrink () = ()
+let unstar slug = 
+    Api.req<bool> ("/chat/room/" + slug + "/unstar") "post" [ ]
 
 let report () = ()
 
