@@ -5,6 +5,9 @@ module User
 open System
 open Wireclub.Boundary.Models
 
+let fetch slug =
+    Api.get<UserProfile> (sprintf "api/users/%s" slug)
+
 let block slug =
     Api.post<unit> (sprintf "users/%s/block" slug)
 
@@ -17,17 +20,6 @@ let addFriend slug =
 let removeFriend slug =
     Api.post<unit> (sprintf "users/%s/removeFriend" slug)
 
-let fetch (ids:string list) = 
-    //TODO Make this return an actual user
-    async {
-        let! account = Account.identity()
-        return
-            match account with
-            | Api.ApiOk account ->
-                Api.ApiOk (  [ for id in ids do yield  { account with Id = id } ] )
-            | error -> Api.Exception (new Exception())
-    }
-    
 let entityBySlug slug =
     Api.req<Entity> ("/users/" + slug + "/entityData") "get" [ ]
 

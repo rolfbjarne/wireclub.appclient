@@ -3,12 +3,13 @@
 module ChannelEvent
 
 open Wireclub.Boundary.Chat
+open Wireclub.Boundary.Models
 
 type ChannelEventType =
 | Unknown
 | Notification of string
 | Message of (*color:*) string * (*font:*) int * (*message:*) string
-| Join of (* user: *) ChatUser
+| Join of (* user: *) UserProfile
 | Leave of string
 | Modifier
 | Drink

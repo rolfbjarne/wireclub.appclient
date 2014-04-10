@@ -9,6 +9,13 @@ open NUnit.Framework
 [<SetUp>]
 let setup () =
     Helpers.setup ()
+    
+[<Test>]
+let ``Fetch User`` () =
+    User.fetch "chris"
+    |> run
+    |> assertApiResult
+    |> printfn "%A"
 
 [<Test>]
 let ``Fetch Entity by Slug`` () =
