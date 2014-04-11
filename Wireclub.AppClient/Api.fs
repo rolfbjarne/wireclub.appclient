@@ -39,6 +39,7 @@ let mutable userToken = ""
 let mutable userCsrf = ""
 
 let mutable baseUrl = "https://www.wireclub.com"
+let mutable webUrl = "https://www.wireclub.com"
 let mutable staticBaseUrl = "http://static.wireclub.com"
 let mutable channelServer = "wss://chat.wireclub.com:8888/events"
 
@@ -49,7 +50,9 @@ staticBaseUrl <- "http://192.168.0.102"
 channelServer <- "wss://192.168.0.102:8888/events"
 #endif
 #if __IOS__
-baseUrl <- "http://192.168.0.102"
+System.Net.ServicePointManager.ServerCertificateValidationCallback <- new System.Net.Security.RemoteCertificateValidationCallback(fun sender cert chain errors -> true)
+baseUrl <- "https://192.168.0.102"
+webUrl <- "http://192.168.0.102"
 staticBaseUrl <- "http://192.168.0.102"
 channelServer <- "wss://192.168.0.102:8888/events"
 #endif
