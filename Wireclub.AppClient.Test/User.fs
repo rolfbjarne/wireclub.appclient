@@ -9,6 +9,7 @@ open NUnit.Framework
 [<SetUp>]
 let setup () =
     Helpers.setup ()
+    Helpers.login ()
     
 [<Test>]
 let ``Fetch User`` () =
@@ -20,6 +21,38 @@ let ``Fetch User`` () =
 [<Test>]
 let ``Fetch Entity by Slug`` () =
     User.entityBySlug "chris"
+    |> run
+    |> assertApiResult
+    |> printfn "%A"
+
+    
+[<Test>]
+let ``Add Friend`` () =
+    User.addFriend "bingo_chief"
+    |> run
+    |> assertApiResult
+    |> printfn "%A"
+
+    
+[<Test>]
+let ``Remove Friend`` () =
+    User.removeFriend "bingo_chief"
+    |> run
+    |> assertApiResult
+    |> printfn "%A"
+
+    
+[<Test>]
+let ``Block User`` () =
+    User.block "bingo_chief"
+    |> run
+    |> assertApiResult
+    |> printfn "%A"
+
+    
+[<Test>]
+let ``Unblock User`` () =
+    User.unblock "bingo_chief"
     |> run
     |> assertApiResult
     |> printfn "%A"

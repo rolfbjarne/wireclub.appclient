@@ -9,18 +9,18 @@ let fetch slug =
     Api.get<UserProfile> (sprintf "api/users/%s" slug)
 
 let block slug =
-    Api.post<unit> (sprintf "users/%s/block" slug)
+    Api.req<bool> (sprintf "users/%s/block" slug) "post" [ "status", "true"; "partial", "true"  ]
 
 let unblock slug =
-    Api.post<unit> (sprintf "users/%s/unblock" slug)
+    Api.req<bool> (sprintf "users/%s/unblock" slug) "post" [ "status", "true"; "partial", "true" ]
 
 let addFriend slug =
-    Api.post<unit> (sprintf "users/%s/addFriend" slug)
+    Api.req<bool> (sprintf "users/%s/addFriend" slug) "post" [ "status", "true"; "partial", "true" ]
 
 let removeFriend slug =
-    Api.post<unit> (sprintf "users/%s/removeFriend" slug)
+    Api.req<bool> (sprintf "users/%s/removeFriend" slug) "post" [ "status", "true"; "partial", "true" ]
 
 let entityBySlug slug =
-    Api.req<Entity> ("/users/" + slug + "/entityData") "get" [ ]
+    Api.get<Entity> ("/users/" + slug + "/entityData")
 
    
