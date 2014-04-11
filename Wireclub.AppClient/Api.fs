@@ -38,7 +38,7 @@ let mutable userId = ""
 let mutable userToken = ""
 let mutable userCsrf = ""
 
-let mutable baseUrl = "http://www.wireclub.com"
+let mutable baseUrl = "https://www.wireclub.com"
 let mutable staticBaseUrl = "http://static.wireclub.com"
 let mutable channelServer = "wss://chat.wireclub.com:8888/events"
 

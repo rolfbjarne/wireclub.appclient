@@ -3,6 +3,7 @@
 module Helpers
 
 open NUnit.Framework
+open System.Net.Security
 
 let run async =
     Async.RunSynchronously async
@@ -21,7 +22,9 @@ let printfn (fmt: Format<_,_,_,_>) x =
 
 
 let setup () =
-    Api.baseUrl <- "http://dev.wireclub.com"
+    System.Net.ServicePointManager.ServerCertificateValidationCallback <- new RemoteCertificateValidationCallback(fun sender cert chain errors -> true)
+
+    Api.baseUrl <- "https://dev.wireclub.com"
     Api.staticBaseUrl <- "http://dev.wireclub.com"
     Api.channelServer <- "ws://dev.wireclub.com:8888/events"
     
