@@ -51,10 +51,10 @@ channelServer <- "wss://192.168.0.102:8888/events"
 #endif
 #if __IOS__
 System.Net.ServicePointManager.ServerCertificateValidationCallback <- new System.Net.Security.RemoteCertificateValidationCallback(fun sender cert chain errors -> true)
-baseUrl <- "https://192.168.0.102"
-webUrl <- "http://192.168.0.102"
-staticBaseUrl <- "http://192.168.0.102"
-channelServer <- "wss://192.168.0.102:8888/events"
+baseUrl <- "https://192.168.0.106"
+webUrl <- "http://192.168.0.106"
+staticBaseUrl <- "http://192.168.0.106"
+channelServer <- "wss://192.168.0.106:8888/events"
 #endif
 #endif
 
