@@ -14,8 +14,8 @@ let (|Route|_|) (route:string) (url:string) =
     else 
         None
     
-let (|User|_|) = function | Route "/users/(.+)$" [ id ] -> Some id | _ -> None
-let (|ChatRoom|_|) = function | Route "/chat/room/(.+)$" [ id ] -> Some id | _ -> None
-let (|ChatSession|_|) = function | Route "/privateChat/session/(.+)$" [ id ] -> Some id | _ -> None
-let (|YouTube|_|) = function | Route "/video/youtube/(.+)$" [ id ] -> Some id | _ -> None
-let (|ExternalRedirect|_|) = function | Route "/redirect/url/(.+)$" [ id ] -> Some id | _ -> None
+let (|User|_|) = function | Route "/users/(.+?)(/|$)" [ id ] -> Some id | _ -> None
+let (|ChatRoom|_|) = function | Route "/chat/room/(.+?)(/|$)" [ id ] -> Some id | _ -> None
+let (|ChatSession|_|) = function | Route "/privateChat/session/(.+?)(/|$)" [ id ] -> Some id | _ -> None
+let (|YouTube|_|) = function | Route "/video/youtube/(.+?)(/|$)" [ id ] -> Some id | _ -> None
+let (|ExternalRedirect|_|) = function | Route "/redirect/url/(.+?)(/|$)" [ id ] -> Some id | _ -> None
