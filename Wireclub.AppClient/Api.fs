@@ -146,8 +146,10 @@ let upload<'A> url name filename (data:byte []) =  async {
 
         let content = new MultipartFormDataContent()
         let fileContent = new ByteArrayContent(data)
-        fileContent.Headers.ContentType <- MediaTypeHeaderValue.Parse("multipart/form-data")
-        fileContent.Headers.ContentDisposition <- new ContentDispositionHeaderValue("attachment", FileName = filename, Name = name)
+        fileContent.Headers.ContentType <- MediaTypeHeaderValue.Parse("application/octet-stream")
+        fileContent.Headers.ContentDisposition <- new ContentDispositionHeaderValue("form-data");
+        fileContent.Headers.ContentDisposition.Parameters.Add(new NameValueHeaderValue("name", sprintf "\"%s\"" name));
+        fileContent.Headers.ContentDisposition.Parameters.Add(new NameValueHeaderValue("filename", sprintf "\"%s\"" filename));
 
         content.Add(fileContent)
         let task = client.PostAsync(url, content)
