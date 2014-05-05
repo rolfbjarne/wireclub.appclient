@@ -30,6 +30,7 @@ handler.AllowAutoRedirect <- false
 let client = new HttpClient(handler)
 client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", agent) |> ignore
 client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("application/json")) |> ignore
+client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("image/png")) |> ignore
 
 let debugSlowNetwork = false
 
