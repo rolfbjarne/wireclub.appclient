@@ -20,9 +20,9 @@ type ChannelEventType =
 | AddedModerator
 | RemovedModerator
 | Ticker
-| AppEvent
+| AppEvent of string
 | AcceptDrink
-| CustomAppEvent
+| CustomAppEvent of string
 | StartApp
 | QuitApp
 | GameChallenge
@@ -32,14 +32,16 @@ type ChannelEventType =
 | PrivateMessage of (*color:*) string * (*font:*) int * (*message:*) string
 | PrivateMessageSent of (*color:*) string * (*font:*) int * (*message:*) string
 | PeekAvailable
-| BingoRoundChanged
-| BingoRoundDraw
-| BingoRoundWon
+| BingoRoundChanged of string
+| BingoRoundDraw of string
+| BingoRoundWon of string
 
 [<CLIMutable>]
 type ChannelEvent = {
     Sequence: int64
     User: string
     Channel: string
+    EventType: int
+    Stamp: uint64
     Event: ChannelEventType
 }

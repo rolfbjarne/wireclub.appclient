@@ -40,6 +40,8 @@ let deserializeEvent sequence eventType stamp (payload:JToken) user channel =
         Sequence = sequence
         User = user
         Channel = channel
+        EventType = eventType
+        Stamp = stamp
         Event = 
             match eventType with
             | 0 -> Notification (payload.Value<string>())
@@ -55,9 +57,9 @@ let deserializeEvent sequence eventType stamp (payload:JToken) user channel =
             | 10 -> AddedModerator
             | 11 -> RemovedModerator
             | 12 -> Ticker
-            | 13 -> AppEvent
+            | 13 -> AppEvent (payload.ToString())
             | 14 -> AcceptDrink
-            | 15 -> CustomAppEvent
+            | 15 -> CustomAppEvent (payload.ToString())
             | 16 -> StartApp
             | 17 -> QuitApp
             | 18 -> GameChallenge
@@ -67,9 +69,9 @@ let deserializeEvent sequence eventType stamp (payload:JToken) user channel =
             | 102 -> PrivateMessage (payload.[0].Value<string>(), payload.[1].Value<int>(), payload.[2].Value<string>())
             | 103 -> PrivateMessageSent (payload.[0].Value<string>(), payload.[1].Value<int>(), payload.[2].Value<string>())
             | 1000 -> PeekAvailable
-            | 10000 -> BingoRoundChanged
-            | 10001 -> BingoRoundDraw
-            | 10002 -> BingoRoundWon
+            | 10000 -> BingoRoundChanged (payload.ToString())
+            | 10001 -> BingoRoundDraw (payload.ToString())
+            | 10002 -> BingoRoundWon (payload.ToString())
             | _ -> Unknown
     }
 
@@ -78,7 +80,7 @@ let deserializeEventList (events:JToken) channel =
     |> Seq.map (fun event -> 
         let sequence = event.[0].Value<int64>()
         let eventType = event.[1].Value<int>()
-        let stamp = event.[2]
+        let stamp = event.[2].Value<uint64>()
         let payload = event.[3]
         let user = event.[4].Value<string>()
         deserializeEvent sequence eventType stamp payload user channel
@@ -111,7 +113,7 @@ let init handler =
                 let channel = event.[0].Value<string>()
                 let nextSequence = event.[1].Value<int64>()
                 let eventType = event.[2].Value<int>()
-                let stamp = event.[3]
+                let stamp = event.[3].Value<uint64>()
                 let payload = event.[4]
                 let user = event.[5].Value<string>()
                 let event = deserializeEvent nextSequence eventType stamp payload user channel
