@@ -67,6 +67,7 @@
     <Compile Include="Routes.fs" />
     <Compile Include="Settings.fs" />
     <Compile Include="User.fs" />
+    <Compile Include="Credits.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" />
 </Project>
