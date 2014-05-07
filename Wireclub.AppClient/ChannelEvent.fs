@@ -5,6 +5,32 @@ module ChannelEvent
 open Wireclub.Boundary.Chat
 open Wireclub.Boundary.Models
 
+type AppEventType =
+| Unknown
+| UserPresenceChanged
+| UserRelationshipChanged
+| ChatNotification
+| ChatNotificationClear
+| ChatPreferencesChanged
+| ClubMembershipChanged
+| EntitySubscriptionChanged
+| NavigateTo
+| SuspendedFromRoom
+| SuspendedGlobally
+| JoinRoom
+| LeaveRoom
+| NotificationsChanged
+| ActiveChannelsChanged
+| DebugEval
+| CreditsBalanceChanged
+| BingoTicketsCountChanged
+| NewFeedItems
+| SlotsTicketsCountChanged
+| BlackjackTicketsCountChanged
+| BingoBonusWon
+| ToastMessage
+| PokerStateChanged
+
 type ChannelEventType =
 | Unknown
 | Notification of string
@@ -20,7 +46,7 @@ type ChannelEventType =
 | AddedModerator
 | RemovedModerator
 | Ticker
-| AppEvent of string
+| AppEvent of AppEventType * string
 | AcceptDrink
 | CustomAppEvent of string
 | StartApp

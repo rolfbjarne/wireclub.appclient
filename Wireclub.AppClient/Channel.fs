@@ -35,6 +35,33 @@ let deserializeUser (payload:JToken) =
         Membership = enum<MembershipTypePublic>(payload.[12].Value<int>())
     }
 
+let deserializeAppEvent (payload:JToken) =
+    match payload.["Type"].Value<int>() with
+    | 0 -> UserPresenceChanged
+    | 1 -> UserRelationshipChanged
+    | 2 -> ChatNotification
+    | 3 -> ChatNotificationClear
+    | 4 -> ChatPreferencesChanged
+    | 5 -> ClubMembershipChanged
+    | 6 -> EntitySubscriptionChanged
+    | 7 -> NavigateTo
+    | 8 -> SuspendedFromRoom
+    | 9 -> SuspendedGlobally
+    | 10 -> JoinRoom
+    | 11 -> LeaveRoom
+    | 12 -> NotificationsChanged
+    | 13 -> ActiveChannelsChanged
+    | 14 -> DebugEval
+    | 15 -> CreditsBalanceChanged
+    | 16 -> BingoTicketsCountChanged
+    | 17 -> NewFeedItems 
+    | 18 -> SlotsTicketsCountChanged
+    | 19 -> BlackjackTicketsCountChanged
+    | 20 -> BingoBonusWon
+    | 21 -> ToastMessage
+    | 22 -> PokerStateChanged
+    | _ -> AppEventType.Unknown 
+ 
 let deserializeEvent sequence eventType stamp (payload:JToken) user channel =
     { 
         Sequence = sequence
@@ -57,7 +84,7 @@ let deserializeEvent sequence eventType stamp (payload:JToken) user channel =
             | 10 -> AddedModerator
             | 11 -> RemovedModerator
             | 12 -> Ticker
-            | 13 -> AppEvent (payload.ToString())
+            | 13 -> AppEvent (deserializeAppEvent payload, payload.ToString())
             | 14 -> AcceptDrink
             | 15 -> CustomAppEvent (payload.ToString())
             | 16 -> StartApp
