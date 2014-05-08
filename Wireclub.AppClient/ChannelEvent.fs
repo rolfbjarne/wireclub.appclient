@@ -8,7 +8,7 @@ open Wireclub.Boundary.Models
 type AppEventType =
 | Unknown
 | UserPresenceChanged
-| UserRelationshipChanged
+| UserRelationshipChanged of (*id:*) string * (*blocked:*) bool
 | ChatNotification
 | ChatNotificationClear
 | ChatPreferencesChanged

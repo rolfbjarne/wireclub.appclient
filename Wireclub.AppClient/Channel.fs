@@ -38,7 +38,7 @@ let deserializeUser (payload:JToken) =
 let deserializeAppEvent (payload:JToken) =
     match payload.["Type"].Value<int>() with
     | 0 -> UserPresenceChanged
-    | 1 -> UserRelationshipChanged
+    | 1 -> UserRelationshipChanged (payload.["Data"].["Id"].Value<string>(), payload.["Data"].["IsBlocked"].Value<bool>())
     | 2 -> ChatNotification
     | 3 -> ChatNotificationClear
     | 4 -> ChatPreferencesChanged
