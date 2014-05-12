@@ -12,3 +12,6 @@ module Timer =
         do! Async.Sleep interval
         return! ticker fn interval
     }
+        
+module Logger =
+    let mutable log: (Exception -> unit) = (fun _ -> failwith "No log handler attached")

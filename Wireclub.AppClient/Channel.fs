@@ -131,39 +131,42 @@ let mutable cancelReconnect = new Threading.CancellationTokenSource()
 
 let init handler =
     let init () =
-        let client = new WebSocket(Api.channelServer, Compression = CompressionMethod.Deflate)
-        webSocket := Some client
+        try 
+            let client = new WebSocket(Api.channelServer, Compression = CompressionMethod.Deflate)
+            webSocket := Some client
 
-        client.OnMessage.Add (fun data -> 
-            try
-                let event = JsonConvert.DeserializeObject data.Data :?> JArray
-                let channel = event.[0].Value<string>()
-                let nextSequence = event.[1].Value<int64>()
-                let eventType = event.[2].Value<int>()
-                let stamp = event.[3].Value<uint64>()
-                let payload = event.[4]
-                let user = event.[5].Value<string>()
-                let event = deserializeEvent nextSequence eventType stamp payload user channel
-                sequence := nextSequence
-                handler channel event
-            with
-            | ex -> printfn "[Channel] Message error: %s" (ex.ToString())
-        )
+            client.OnMessage.Add (fun data -> 
+                try
+                    let event = JsonConvert.DeserializeObject data.Data :?> JArray
+                    let channel = event.[0].Value<string>()
+                    let nextSequence = event.[1].Value<int64>()
+                    let eventType = event.[2].Value<int>()
+                    let stamp = event.[3].Value<uint64>()
+                    let payload = event.[4]
+                    let user = event.[5].Value<string>()
+                    let event = deserializeEvent nextSequence eventType stamp payload user channel
+                    sequence := nextSequence
+                    handler channel event
+                with
+                | ex ->  Logger.log (ex)
+            )
 
-        printfn "[Channel] Opening websocket connection %s" Api.channelServer
-        client.Connect()
-        client.Send("auth=" + Api.userToken)
-        client.Send("seq=" + (!sequence).ToString())
-        printfn "[Channel] Connection open"
+            printfn "[Channel] Opening websocket connection %s" Api.channelServer
+            client.Connect()
+            client.Send("auth=" + Api.userToken)
+            client.Send("seq=" + (!sequence).ToString())
+            printfn "[Channel] Connection open"
 
-        client.OnError.Add (fun e ->
-            printfn "[Channel] Websocket error: %s" e.Message
-            client.CloseAsync ()
-        )
+            client.OnError.Add (fun e ->
+                Logger.log (new Exception(sprintf "[Channel] Websocket error: %s" e.Message))
+                client.CloseAsync ()
+            )
 
-        client.OnClose.Add (fun e ->
-            printfn "[Channel] Websocket closed: %s" e.Reason
-        )
+            client.OnClose.Add (fun e ->
+                Logger.log (new Exception(sprintf "[Channel] Websocket closed: %s" e.Reason))
+            )
+
+        with ex -> Logger.log (ex)
 
     cancelReconnect.Cancel()
     cancelReconnect <- new Threading.CancellationTokenSource()
