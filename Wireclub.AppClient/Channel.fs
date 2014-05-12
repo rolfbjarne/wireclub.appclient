@@ -131,7 +131,7 @@ let mutable cancelReconnect = new Threading.CancellationTokenSource()
 
 let init handler =
     let init () =
-        let client = new WebSocket(Api.channelServer, Compression = CompressionMethod.DEFLATE)
+        let client = new WebSocket(Api.channelServer, Compression = CompressionMethod.Deflate)
         webSocket := Some client
 
         client.OnMessage.Add (fun data -> 
@@ -170,7 +170,7 @@ let init handler =
     Async.Start(Timer.ticker (fun _ -> 
         lock mutex (fun _ ->
             match !webSocket with
-            | Some current when (current.ReadyState = WebSocketState.CLOSED) -> init ()
+            | Some current when (current.ReadyState = WebSocketState.Closed) -> init ()
             | None -> init ()
             | _ -> ()
         )
@@ -181,7 +181,7 @@ let close () =
         match !webSocket with
         | Some current ->
             cancelReconnect.Cancel()
-            current.CloseAsync(CloseStatusCode.NORMAL, "Connection closed explicitly")
+            current.CloseAsync(CloseStatusCode.Normal, "Connection closed explicitly")
             webSocket := None
         | _-> ()
     )
