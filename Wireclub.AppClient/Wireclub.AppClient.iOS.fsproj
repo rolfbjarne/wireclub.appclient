@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0AA0452B-6D60-4FA3-A54C-0BAF2A672111}</ProjectGuid>
     <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{4925A630-B079-445D-BCD4-3A9C94FE9307}</ProjectTypeGuids>
@@ -44,6 +44,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Wireclub.iOS\lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="ModernHttpClient.iOS">
+      <HintPath>..\..\Wireclub.iOS\Components\modernhttpclient-1.2.2\lib\ios\ModernHttpClient.iOS.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\NEXT\Wireclub.Boundary\Wireclub.Boundary.iOS.fsproj">
@@ -70,4 +73,10 @@
     <Compile Include="Credits.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" />
+  <ItemGroup>
+    <XamarinComponentReference Include="modernhttpclient">
+      <Version>1.2.2</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+  </ItemGroup>
 </Project>

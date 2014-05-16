@@ -20,9 +20,7 @@ let handleLogin result =
     | resp -> resp
 
 let logout () =
-    Api.client.DefaultRequestHeaders.Remove("x-csrf-token") |> ignore
-    for cookie in Api.handler.CookieContainer.GetCookies(new Uri(Api.baseUrl)) do
-        cookie.Expires <- DateTime.UtcNow.AddHours(-1.0)
+    Api.client <- new System.Net.Http.HttpClient(Api.handler)
     Api.userId <- null
     Api.userIdentity <- None
     Api.userCsrf <- null

@@ -16,21 +16,17 @@ let version = "1.0"
 let mutable agent = "wireclub-app-client/" + version
 #if __ANDROID__
 agent <- "wireclub-app-android/" + version
+let handler = new ModernHttpClient.OkHttpNetworkHandler()
 #endif
 #if __IOS__
 agent <- "wireclub-app-ios/" + version
+let handler = new ModernHttpClient.NSUrlSessionHandler()
 #endif
 
 
-let cookies = new CookieContainer()
-let handler = new HttpClientHandler()
-handler.CookieContainer <- cookies
-handler.AllowAutoRedirect <- false
-
-let client = new HttpClient(handler)
+let mutable client = new HttpClient(handler)
 client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", agent) |> ignore
 client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("application/json")) |> ignore
-client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("image/png")) |> ignore
 
 let debugSlowNetwork = false
 
@@ -51,11 +47,10 @@ staticBaseUrl <- "http://192.168.0.102"
 channelServer <- "wss://192.168.0.102:8888/events"
 #endif
 #if __IOS__
-System.Net.ServicePointManager.ServerCertificateValidationCallback <- new System.Net.Security.RemoteCertificateValidationCallback(fun sender cert chain errors -> true)
-baseUrl <- "https://192.168.0.106"
+baseUrl <- "http://192.168.0.106"
 webUrl <- "http://192.168.0.106"
 staticBaseUrl <- "http://192.168.0.106"
-channelServer <- "wss://192.168.0.106:8888/events"
+channelServer <- "ws://192.168.0.106:8888/events"
 #endif
 #endif
 
@@ -117,6 +112,8 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
 
         if debugSlowNetwork then
             do! Async.Sleep (5 * 1000)
+
+        let mutable client = new HttpClient(new ModernHttpClient.NSUrlSessionHandler())
 
         let task =
             match httpMethod.ToUpperInvariant() with
