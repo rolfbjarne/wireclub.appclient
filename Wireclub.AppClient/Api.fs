@@ -25,14 +25,7 @@ agent <- "wireclub-app-ios/" + version
 #endif
 
 
-let cookies = new CookieContainer()
-let handler = new HttpClientHandler()
-handler.CookieContainer <- cookies
-handler.AllowAutoRedirect <- false
-
-let client = new HttpClient(handler)
-client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", agent) |> ignore
-client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("application/json")) |> ignore
+let mutable cookies = new CookieContainer()
 
 let debugSlowNetwork = false
 
@@ -77,30 +70,23 @@ let fullUrl (url:string) =
     | true -> url
     | false -> Uri(Uri(baseUrl), url).ToString()
 
-let respParse<'A> status (data:NSData) = async {
-    let stringContent () = 
-        use stream = data.AsStream()
-        use reader = new StreamReader(stream)
-        Async.AwaitTask (reader.ReadToEndAsync())
+let respParse<'A> status (data:byte[]) = async {
+    let content = System.Text.Encoding.UTF8.GetString(data)
+    printfn "%s" content
 
     match int status with
     | 200 when typeof<'A> = typeof<byte[]> -> 
-        use stream = data.AsStream()
-        let! content = stream.AsyncRead(int data.Length)
-        return ApiOk (content :> obj :?> 'A)
+        return ApiOk (data :> obj :?> 'A)
     | 200 when typeof<'A> = typeof<string> -> 
-        let! content = stringContent ()
         return ApiOk (content :> obj :?> 'A)
     | 200 when typeof<'A> = typeof<unit> ->
         return ApiOk (() :> obj :?> 'A)
     | 200 ->
-        let! content = stringContent ()
         try
             return ApiOk (JsonConvert.DeserializeObject<'A>(content))
         with
         | ex -> return Deserialization (ex, content)
     | 400 -> 
-        let! content = stringContent ()
         try
             return BadRequest (JsonConvert.DeserializeObject<ApiError[]>(content) |> List.ofArray)
         with
@@ -108,7 +94,6 @@ let respParse<'A> status (data:NSData) = async {
     | 401
     | 403 -> return Unauthorized
     | status -> 
-        let! content = stringContent ()
         return HttpError (status, content)
 }
 
@@ -127,13 +112,15 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
         let headers = new NSMutableDictionary()
         let request = new NSMutableUrlRequest(NSUrl.FromString url)
         request.HttpMethod <- httpMethod.ToUpperInvariant()
-        request.ShouldHandleCookies <- true
-        headers.SetValueForKey(NSObject.FromObject (NSString.op_Explicit agent), NSString.op_Explicit "User-Agent")
+        headers.SetValueForKey(NSString.op_Explicit agent, NSString.op_Explicit "User-Agent")
+        headers.SetValueForKey(NSString.op_Explicit (cookies.GetCookieHeader(new Uri(url))), NSString.op_Explicit "Cookie")
+        headers.SetValueForKey(NSString.op_Explicit "application/json", NSString.op_Explicit "Accept")
+        headers.SetValueForKey(NSString.op_Explicit userCsrf, NSString.op_Explicit "x-csrf-token")
 
         if httpMethod.ToUpperInvariant() = "POST" then
             request.Body <- NSData.FromString(String.concat "&" [ for k, v in data do yield sprintf "%s=%s" k v ], NSStringEncoding.UTF8)
-            headers.SetValueForKey(NSObject.FromObject (NSString.op_Explicit (request.Body.Length.ToString())), NSString.op_Explicit "Content-Length")
-            headers.SetValueForKey(NSObject.FromObject (NSString.op_Explicit "application/x-www-form-urlencoded charset=utf-8"), NSString.op_Explicit "Content-Type")
+            headers.SetValueForKey(NSString.op_Explicit (request.Body.Length.ToString()), NSString.op_Explicit "Content-Length")
+            headers.SetValueForKey(NSString.op_Explicit "application/x-www-form-urlencoded charset=utf-8", NSString.op_Explicit "Content-Type")
 
         request.Headers <- headers
 
@@ -148,6 +135,10 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
                         new NSUrlConnectionDelegate() with
                         override this.ReceivedResponse(connection, response) = 
                             let response = response :?> NSHttpUrlResponse
+                            match response.AllHeaderFields.TryGetValue(NSString.op_Explicit "Set-Cookie") with
+                            | true, cookie -> cookies.SetCookies(new Uri (url), NSString.op_Implicit (cookie :?> NSString))
+                            | _ -> ()
+
                             status := response.StatusCode
                             data := new NSMutableData ()
                         override this.ReceivedData(connection, d) =
@@ -156,8 +147,10 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
                             connections.Remove(id) |> ignore
                             econt (new Exception(sprintf "%s\n%s" error.Description error.DebugDescription))
                         override this.FinishedLoading(connection) =
+                            let dataBytes= Array.zeroCreate<byte> (Convert.ToInt32(data.Value.Length))
+                            System.Runtime.InteropServices.Marshal.Copy(data.Value.Bytes, dataBytes, 0, Convert.ToInt32(data.Value.Length))
                             connections.Remove(id) |> ignore
-                            cont (!status, !data)
+                            cont (!status, dataBytes)
                     })
 
             connections.Add(id, connection)
@@ -176,7 +169,7 @@ let post<'A> url = req<'A> url "POST" []
 let get<'A> url = req<'A> url "GET" []
 
 let upload<'A> url name filename (data:byte []) =  async {
-    let! resp = respParse<'A> 500 (new NSMutableData())
+    let! resp = respParse<'A> 500 (Array.zeroCreate<byte> 0)
     return resp
 //
 //    try
