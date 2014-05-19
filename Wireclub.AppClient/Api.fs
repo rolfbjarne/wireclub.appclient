@@ -112,6 +112,8 @@ let respParse<'A> status (data:NSData) = async {
         return HttpError (status, content)
 }
 
+let connections = new Dictionary<Guid, NSUrlConnection>()
+
 let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = async {
     try
         let stopwatch = Stopwatch()
@@ -138,6 +140,7 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
         let! status, data = Async.FromContinuations(fun (cont, econt, _) ->
             let data = ref (new NSMutableData ())
             let status = ref 500
+            let id = Guid.NewGuid()
             let connection =
                 new NSUrlConnection(
                     request,
@@ -150,14 +153,16 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
                         override this.ReceivedData(connection, d) =
                             (!data).AppendData(d)
                         override this.FailedWithError(connection, error) =
+                            connections.Remove(id) |> ignore
                             econt (new Exception(sprintf "%s\n%s" error.Description error.DebugDescription))
                         override this.FinishedLoading(connection) =
+                            connections.Remove(id) |> ignore
                             cont (!status, !data)
                     })
 
+            connections.Add(id, connection)
             connection.Start()
         )
-
 
         printfn "[API] %s %s %i %ims" httpMethod url status (stopwatch.ElapsedMilliseconds)
 
