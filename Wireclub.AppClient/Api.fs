@@ -71,9 +71,7 @@ let fullUrl (url:string) =
     | false -> Uri(Uri(baseUrl), url).ToString()
 
 let respParse<'A> status (data:byte[]) = async {
-    let content = System.Text.Encoding.UTF8.GetString(data)
-    printfn "%s" content
-
+    let content  = lazy System.Text.Encoding.UTF8.GetString(data)
     match int status with
     | 200 when typeof<'A> = typeof<byte[]> -> 
         return ApiOk (data :> obj :?> 'A)
@@ -83,21 +81,19 @@ let respParse<'A> status (data:byte[]) = async {
         return ApiOk (() :> obj :?> 'A)
     | 200 ->
         try
-            return ApiOk (JsonConvert.DeserializeObject<'A>(content))
+            return ApiOk (JsonConvert.DeserializeObject<'A>(content.Value))
         with
-        | ex -> return Deserialization (ex, content)
+        | ex -> return Deserialization (ex, content.Value)
     | 400 -> 
         try
-            return BadRequest (JsonConvert.DeserializeObject<ApiError[]>(content) |> List.ofArray)
+            return BadRequest (JsonConvert.DeserializeObject<ApiError[]>(content.Value) |> List.ofArray)
         with
-        | ex -> return Deserialization (ex, content)
+        | ex -> return Deserialization (ex, content.Value)
     | 401
     | 403 -> return Unauthorized
     | status -> 
-        return HttpError (status, content)
+        return HttpError (status, content.Value)
 }
-
-let connections = new Dictionary<Guid, NSUrlConnection>()
 
 let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = async {
     try
@@ -144,16 +140,13 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
                         override this.ReceivedData(connection, d) =
                             (!data).AppendData(d)
                         override this.FailedWithError(connection, error) =
-                            connections.Remove(id) |> ignore
                             econt (new Exception(sprintf "%s\n%s" error.Description error.DebugDescription))
                         override this.FinishedLoading(connection) =
                             let dataBytes= Array.zeroCreate<byte> (Convert.ToInt32(data.Value.Length))
                             System.Runtime.InteropServices.Marshal.Copy(data.Value.Bytes, dataBytes, 0, Convert.ToInt32(data.Value.Length))
-                            connections.Remove(id) |> ignore
                             cont (!status, dataBytes)
                     })
 
-            connections.Add(id, connection)
             connection.Start()
         )
 
