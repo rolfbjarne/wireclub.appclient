@@ -10,8 +10,6 @@ open Wireclub.Boundary.Models
 let handleLogin result =
     match result with
     | Api.ApiOk result ->
-        Api.client.DefaultRequestHeaders.Remove("x-csrf-token") |> ignore
-        Api.client.DefaultRequestHeaders.TryAddWithoutValidation("x-csrf-token", result.Csrf) |> ignore
         Api.userId <- result.Identity.Id
         Api.userIdentity <- Some result.Identity
         Api.userCsrf <- result.Csrf
@@ -20,7 +18,7 @@ let handleLogin result =
     | resp -> resp
 
 let logout () =
-    Api.client <- new System.Net.Http.HttpClient(Api.handler)
+    Api.cookies <- new System.Net.CookieContainer()
     Api.userId <- null
     Api.userIdentity <- None
     Api.userCsrf <- null

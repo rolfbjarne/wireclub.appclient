@@ -3,6 +3,7 @@
 module Api
 
 open System
+open System.Linq
 open System.Net
 open System.Net.Http
 open System.Net.Http.Headers
@@ -16,17 +17,12 @@ let version = "1.0"
 let mutable agent = "wireclub-app-client/" + version
 #if __ANDROID__
 agent <- "wireclub-app-android/" + version
-let handler = new ModernHttpClient.OkHttpNetworkHandler()
 #endif
 #if __IOS__
 agent <- "wireclub-app-ios/" + version
-let handler = new ModernHttpClient.NSUrlSessionHandler()
 #endif
 
-
-let mutable client = new HttpClient(handler)
-client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", agent) |> ignore
-client.DefaultRequestHeaders.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("application/json")) |> ignore
+let mutable cookies = new CookieContainer()
 
 let debugSlowNetwork = false
 
@@ -71,9 +67,13 @@ let fullUrl (url:string) =
     | true -> url
     | false -> Uri(Uri(baseUrl), url).ToString()
 
-let respParse<'A> (resp:HttpResponseMessage) = async {
+let respParse<'A> (url:string) (resp:HttpResponseMessage) = async {
     let stringContent () = 
             Async.AwaitTask (resp.Content.ReadAsStringAsync())
+
+    match resp.Headers.TryGetValues("Set-Cookie") with
+    | true, header -> if header.Any() then cookies.SetCookies(new Uri(url), header.First())
+    | _ -> ()
 
     match int resp.StatusCode with
     | 200 when typeof<'A> = typeof<byte[]> -> 
@@ -113,20 +113,23 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
         if debugSlowNetwork then
             do! Async.Sleep (5 * 1000)
 
-        let mutable client = new HttpClient(new ModernHttpClient.NSUrlSessionHandler())
-
-        let task =
+        let message = 
             match httpMethod.ToUpperInvariant() with
-            | "GET" -> client.GetAsync url
-            | "POST" -> client.PostAsync(url, new FormUrlEncodedContent(data |> List.map (fun (k, v) -> KeyValuePair(k,v))))
+            | "GET" -> new HttpRequestMessage(HttpMethod.Get, url)
+            | "POST" -> new HttpRequestMessage(HttpMethod.Post, url, Content = new FormUrlEncodedContent(data |> List.map (fun (k, v) -> KeyValuePair(k,v))))
             | _ -> failwithf "Unsupported method: %s" httpMethod
+        message.Headers.TryAddWithoutValidation("Cookie", cookies.GetCookieHeader(new Uri (url))) |> ignore
+        message.Headers.TryAddWithoutValidation("User-Agent", agent) |> ignore
+        message.Headers.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("application/json")) |> ignore
 
-        let! resp = Async.AwaitTask task
+        let client = new HttpClient(new ModernHttpClient.NSUrlSessionHandler())
+
+        let! resp = Async.AwaitTask (client.SendAsync message)
         do! (awaitTask (resp.Content.LoadIntoBufferAsync()))
 
         printfn "[API] %s %s %i %ims" httpMethod url (int resp.StatusCode) (stopwatch.ElapsedMilliseconds)
 
-        let! resp = respParse<'A> resp
+        let! resp = respParse<'A> url resp
         return resp
     with
     | ex -> return Exception ex
@@ -150,14 +153,22 @@ let upload<'A> url name filename (data:byte []) =  async {
         fileContent.Headers.ContentDisposition.Parameters.Add(new NameValueHeaderValue("filename", sprintf "\"%s\"" filename));
 
         content.Add(fileContent)
-        let task = client.PostAsync(url, content)
+
+        let message = new HttpRequestMessage(HttpMethod.Post, url, Content = content)
+        message.Headers.TryAddWithoutValidation("Cookie", cookies.GetCookieHeader(new Uri (url))) |> ignore
+        message.Headers.TryAddWithoutValidation("User-Agent", agent) |> ignore
+        message.Headers.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("application/json")) |> ignore
+
+        let client = new HttpClient(new ModernHttpClient.NSUrlSessionHandler())
+
+        let task = client.SendAsync(message)
 
         let! resp = Async.AwaitTask task
         do! (awaitTask (resp.Content.LoadIntoBufferAsync()))
 
         printfn "[API] %s %s %i %ims" "POST" url (int resp.StatusCode) (stopwatch.ElapsedMilliseconds)
 
-        let! resp = respParse<'A> resp
+        let! resp = respParse<'A> url resp
         return resp
     with
     | ex -> return Exception ex
