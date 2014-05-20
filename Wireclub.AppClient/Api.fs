@@ -122,9 +122,14 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
         message.Headers.TryAddWithoutValidation("User-Agent", agent) |> ignore
         message.Headers.Accept.Add(Headers.MediaTypeWithQualityHeaderValue("application/json")) |> ignore
 
-        let client = new HttpClient(new ModernHttpClient.NSUrlSessionHandler())
+        let! resp = Async.FromContinuations(fun (cont, econt, ccont) ->
+            let invoker = new MonoTouch.Foundation.NSObject()
+            invoker.InvokeOnMainThread(fun _ -> 
+                let client = new HttpClient(new ModernHttpClient.NSUrlSessionHandler())
+                Async.StartWithContinuations (Async.AwaitTask (client.SendAsync message), cont, econt, ccont)
+            )
+        )
 
-        let! resp = Async.AwaitTask (client.SendAsync message)
         do! (awaitTask (resp.Content.LoadIntoBufferAsync()))
 
         printfn "[API] %s %s %i %ims" httpMethod url (int resp.StatusCode) (stopwatch.ElapsedMilliseconds)
