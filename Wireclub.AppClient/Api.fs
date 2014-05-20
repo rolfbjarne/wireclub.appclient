@@ -121,33 +121,36 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
         request.Headers <- headers
 
         let! status, data = Async.FromContinuations(fun (cont, econt, _) ->
-            let data = ref (new NSMutableData ())
-            let status = ref 500
-            let id = Guid.NewGuid()
-            let connection =
-                new NSUrlConnection(
-                    request,
-                    {
-                        new NSUrlConnectionDelegate() with
-                        override this.ReceivedResponse(connection, response) = 
-                            let response = response :?> NSHttpUrlResponse
-                            match response.AllHeaderFields.TryGetValue(NSString.op_Explicit "Set-Cookie") with
-                            | true, cookie -> cookies.SetCookies(new Uri (url), NSString.op_Implicit (cookie :?> NSString))
-                            | _ -> ()
+            let invoker = new NSObject()
+            invoker.InvokeOnMainThread(fun _ -> 
+                let data = ref (new NSMutableData ())
+                let status = ref 500
+                let id = Guid.NewGuid()
+                let connection =
+                    new NSUrlConnection(
+                        request,
+                        {
+                            new NSUrlConnectionDelegate() with
+                            override this.ReceivedResponse(connection, response) = 
+                                let response = response :?> NSHttpUrlResponse
+                                match response.AllHeaderFields.TryGetValue(NSString.op_Explicit "Set-Cookie") with
+                                | true, cookie -> cookies.SetCookies(new Uri (url), NSString.op_Implicit (cookie :?> NSString))
+                                | _ -> ()
 
-                            status := response.StatusCode
-                            data := new NSMutableData ()
-                        override this.ReceivedData(connection, d) =
-                            (!data).AppendData(d)
-                        override this.FailedWithError(connection, error) =
-                            econt (new Exception(sprintf "%s\n%s" error.Description error.DebugDescription))
-                        override this.FinishedLoading(connection) =
-                            let dataBytes= Array.zeroCreate<byte> (Convert.ToInt32(data.Value.Length))
-                            System.Runtime.InteropServices.Marshal.Copy(data.Value.Bytes, dataBytes, 0, Convert.ToInt32(data.Value.Length))
-                            cont (!status, dataBytes)
-                    })
+                                status := response.StatusCode
+                                data := new NSMutableData ()
+                            override this.ReceivedData(connection, d) =
+                                (!data).AppendData(d)
+                            override this.FailedWithError(connection, error) =
+                                econt (new Exception(sprintf "%s\n%s" error.Description error.DebugDescription))
+                            override this.FinishedLoading(connection) =
+                                let dataBytes= Array.zeroCreate<byte> (Convert.ToInt32(data.Value.Length))
+                                System.Runtime.InteropServices.Marshal.Copy(data.Value.Bytes, dataBytes, 0, Convert.ToInt32(data.Value.Length))
+                                cont (!status, dataBytes)
+                        })
 
-            connection.Start()
+                connection.Start()
+            )
         )
 
         printfn "[API] %s %s %i %ims" httpMethod url status (stopwatch.ElapsedMilliseconds)
