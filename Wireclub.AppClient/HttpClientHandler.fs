@@ -73,7 +73,7 @@ type HttpClientHandler () =
                 else
                     let status =  enum<HttpStatusCode>(data.Response.StatusCode)
                     let response =
-                        new HttpResponseMessage(
+                        new HttpResponseMessage(status,
                             Content = new StreamContent(data.ResponseBody.AsStream()),
                             RequestMessage = data.Request
                         )
