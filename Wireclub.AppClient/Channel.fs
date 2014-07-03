@@ -159,12 +159,6 @@ let init handler =
 
             client.OnError.Add (fun e ->
                 Logger.log (new Exception(sprintf "[Channel] Websocket error: %s" e.Message))
-                match client.ReadyState with
-                | WebSocketState.Closed
-                | WebSocketState.Closing -> ()
-                | WebSocketState.Connecting
-                | WebSocketState.Open
-                | _ -> client.CloseAsync ()
             )
 
             client.OnClose.Add (fun e ->
