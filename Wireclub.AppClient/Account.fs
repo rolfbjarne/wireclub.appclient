@@ -41,6 +41,7 @@ let login username password = async {
             [
                 "username", username
                 "password", password
+                "rememberMe", "true"
             ])
     
     return handleLogin resp
