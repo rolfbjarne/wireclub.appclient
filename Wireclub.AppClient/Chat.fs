@@ -23,9 +23,13 @@ let join slug = async {
 
                     Api.ApiOk (result, events)
                 with
-                // ## TODO handle failer better
                 | ex -> Api.Exception ex
-            | error -> Api.Exception (new Exception())
+            | Api.BadRequest result -> Api.BadRequest result
+            | Api.Unauthorized -> Api.Unauthorized
+            | Api.Timeout -> Api.Timeout
+            | Api.HttpError (code, desc) -> Api.HttpError (code, desc)
+            | Api.Deserialization (ex, key) -> Api.Deserialization (ex, key)
+            | Api.Exception ex -> Api.Exception ex
         return resp
     }
 
