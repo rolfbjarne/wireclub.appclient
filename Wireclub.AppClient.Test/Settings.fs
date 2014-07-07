@@ -150,3 +150,17 @@ let ``Update Content Rating`` () =
     |> run
     |> assertApiResult
     |> ignore
+
+[<Test>]
+let ``Register Device & Update Push Token`` () =
+    let deviceId = 
+        Settings.registerDevice "123"
+        |> run
+        |> assertApiResult
+
+    printfn "Device id: %s" deviceId
+
+    Settings.updateDevicePushToken deviceId "456"
+    |> run
+    |> assertApiResult
+

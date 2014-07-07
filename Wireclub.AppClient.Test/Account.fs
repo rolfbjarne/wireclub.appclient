@@ -75,3 +75,4 @@ let ``Reset Password`` () =
     Account.resetPassword email
     |> run
     |> assertApiResult
+    |> ignore

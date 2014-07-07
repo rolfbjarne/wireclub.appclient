@@ -87,3 +87,14 @@ let unblock (ids:string list) =
 
 let updateContentOptions (showRatedR:bool) =
     Api.req<obj> "/chat/doContentRatingOptions" "post"  [ "showRatingR", string showRatedR ]
+
+let registerDevice pushToken = async {
+    let! resp = Api.req<string> "/api/settings/registerDevice" "post" [ "pushToken", pushToken ]
+    return
+        match resp with
+        | Api.ApiOk result -> Api.ApiOk (result.Trim [|'"'|])
+        | resp -> resp
+}
+
+let updateDevicePushToken deviceId token =
+    Api.req<unit> "/api/settings/updateDevicePushToken" "post" [ "deviceId", deviceId; "token", token ]
