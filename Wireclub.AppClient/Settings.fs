@@ -98,3 +98,6 @@ let registerDevice pushToken = async {
 
 let updateDevicePushToken deviceId token =
     Api.req<unit> "/api/settings/updateDevicePushToken" "post" [ "deviceId", deviceId; "token", token ]
+
+let deleteDevice deviceId =
+    Api.req<unit> "/api/settings/deleteDevice" "post" [ "deviceId", deviceId ]

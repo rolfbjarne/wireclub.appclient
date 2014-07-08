@@ -164,3 +164,13 @@ let ``Register Device & Update Push Token`` () =
     |> run
     |> assertApiResult
 
+[<Test>]
+let ``Delete Device`` () =
+    let deviceId = 
+        Settings.registerDevice "123"
+        |> run
+        |> assertApiResult
+
+    Settings.deleteDevice deviceId
+    |> run
+    |> assertApiResult
