@@ -151,23 +151,28 @@ let ``Update Content Rating`` () =
     |> assertApiResult
     |> ignore
 
+let randomToken prefix =
+    let random = System.Random ()
+    let str = [| for _ in 0..63 -> random.Next(int '0', int '9') |> char |> string |] |> String.concat ""
+    prefix + (str.Substring (0, str.Length - prefix.Length))
+
 [<Test>]
 let ``Register Device & Update Push Token`` () =
     let deviceId = 
-        Settings.registerDevice "123"
+        Settings.registerDevice (randomToken "aaa")
         |> run
         |> assertApiResult
 
     printfn "Device id: %s" deviceId
 
-    Settings.updateDevicePushToken deviceId "456"
+    Settings.updateDevicePushToken deviceId (randomToken "bbb")
     |> run
     |> assertApiResult
 
 [<Test>]
 let ``Delete Device`` () =
     let deviceId = 
-        Settings.registerDevice "123"
+        Settings.registerDevice (randomToken "ccc")
         |> run
         |> assertApiResult
 
