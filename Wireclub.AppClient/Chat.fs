@@ -37,12 +37,10 @@ let keepAlive slug =
     Api.req<unit> ("/api/chat/keepAlive/" + slug) "post" [ ]
 
 let leave slug =
-    Api.req<string> ("/chat/room/" + slug + "/leave") "post" [ ]
+    Api.req<string> ("/chat/room/" + slug + "/leaveRoom") "post" [ ]
 
 let send slug line =
-    Api.req<ChannelPostResult> ("/chat/room/" + slug + "/send2") "post" [
-        "line", line
-    ]
+    Api.req<ChannelPostResult> ("/chat/room/" + slug + "/send2") "post" [ "line", line ]
 
 let entityBySlug slug =
     Api.req<Entity> ("/chat/room/" + slug + "/entityData") "get" [ ]
