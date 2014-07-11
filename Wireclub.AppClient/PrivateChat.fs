@@ -24,3 +24,8 @@ let send receiver message =
 let changeOnlineState (state:OnlineStateType) = 
     Api.req<unit> ("privateChat/changeOnlineState") "post" [ "state", string (int state) ]
 
+let setMobile () =
+    Api.req<unit> "api/settings/setMobile" "post" []
+
+let updatePresence () =
+    Api.req<unit> "home/presence" "post" []

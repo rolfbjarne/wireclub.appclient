@@ -54,3 +54,17 @@ let ``Change Online State`` () =
     |> run
     |> assertApiResult
     |> ignore
+
+[<Test>]
+let ``Set mobile or offline`` () =
+    PrivateChat.setMobile ()
+    |> run
+    |> assertApiResult
+    |> ignore
+
+[<Test>]
+let ``Update presence`` () =
+    PrivateChat.updatePresence ()
+    |> run
+    |> assertApiResult
+    |> ignore
