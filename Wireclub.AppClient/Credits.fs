@@ -9,3 +9,6 @@ open Wireclub.Boundary.Settings
 
 let bundles () =
     Api.req<CreditBundles> "api/credits/bundles" "get" []
+
+let appStorePurchase receipt =
+    Api.req<string> "api/credits/appStorePurchase" "post" [ "recipetData", receipt ]

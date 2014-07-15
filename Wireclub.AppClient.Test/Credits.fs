@@ -21,3 +21,9 @@ let ``Fetch Bundles`` () =
     |> ignore
 
     
+[<Test>]
+let ``App Store Purchase`` () =
+    Credits.appStorePurchase "receiptData"
+    |> run
+    |> assertApiResult
+    |> ignore
