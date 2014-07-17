@@ -22,7 +22,7 @@ type AppEventType =
 | NotificationsChanged
 | ActiveChannelsChanged
 | DebugEval
-| CreditsBalanceChanged
+| CreditsBalanceChanged of (*balance:*) int
 | BingoTicketsCountChanged
 | NewFeedItems
 | SlotsTicketsCountChanged

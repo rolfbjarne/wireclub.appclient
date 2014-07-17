@@ -52,7 +52,7 @@ let deserializeAppEvent (payload:JToken) =
     | 12 -> NotificationsChanged
     | 13 -> ActiveChannelsChanged
     | 14 -> DebugEval
-    | 15 -> CreditsBalanceChanged
+    | 15 -> CreditsBalanceChanged (payload.["Data"].Value<int>())
     | 16 -> BingoTicketsCountChanged
     | 17 -> NewFeedItems 
     | 18 -> SlotsTicketsCountChanged
