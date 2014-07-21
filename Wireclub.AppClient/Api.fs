@@ -12,7 +12,7 @@ open System.Diagnostics
 open Newtonsoft.Json
 open Wireclub.Boundary
 
-let version = "1.0"
+let version = "1.1"
 let mutable agent = "wireclub-app-client/" + version
 
 let mutable cookies:CookieContainer = null
