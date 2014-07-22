@@ -25,7 +25,9 @@ let logout () =
     Api.client <- null
 
     #if __IOS__
-    Api.handler <- new iOS.HttpClientHandler()
+    let handler = new iOS.HttpClientHandler()
+    handler.ClearCookies ()
+    Api.handler <- handler
     #endif
 
     Api.userId <- null

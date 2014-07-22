@@ -94,6 +94,10 @@ type HttpClientHandler () =
 
     let session:NSUrlSession = NSUrlSession.FromConfiguration(NSUrlSessionConfiguration.DefaultSessionConfiguration, nsUrlSessionDelegate, null)
 
+    member this.ClearCookies () =
+        for cookie in NSUrlSessionConfiguration.DefaultSessionConfiguration.HttpCookieStorage.Cookies do
+            NSUrlSessionConfiguration.DefaultSessionConfiguration.HttpCookieStorage.DeleteCookie cookie
+
     override this.SendAsync(request:HttpRequestMessage, cancellationToken:CancellationToken) =
         Async.StartAsTask (async {
             use memoryStream = new MemoryStream()
