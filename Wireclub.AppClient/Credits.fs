@@ -11,4 +11,4 @@ let bundles () =
     Api.req<CreditBundles> "api/credits/bundles" "get" []
 
 let appStorePurchase tx receipt =
-    Api.req<string> "api/credits/appStorePurchase" "post" [ "tx", tx ; "receipt", receipt ]
+    Api.req<CreditBundle> "api/credits/appStorePurchase" "post" [ "tx", tx ; "receipt", receipt ]
