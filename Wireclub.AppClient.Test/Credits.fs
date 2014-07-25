@@ -23,7 +23,7 @@ let ``Fetch Bundles`` () =
     
 [<Test>]
 let ``App Store Purchase`` () =
-    Credits.appStorePurchase "000000001" "receiptData"
+    Credits.appStorePurchase "receiptData"
     |> run
     |> assertApiResult
     |> ignore
