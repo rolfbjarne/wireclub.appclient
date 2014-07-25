@@ -46,13 +46,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\NEXT\Wireclub.Boundary\Wireclub.Boundary.iOS.fsproj">
-      <Project>{F83837F7-71B9-4EEB-85B8-276B8767DA2B}</Project>
-      <Name>Wireclub.Boundary.iOS</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\websocket-sharp\websocket-sharp\websocket-sharp-ios.csproj">
       <Project>{D476C912-8459-4A6B-AA01-CE3EFDD89CFF}</Project>
       <Name>websocket-sharp-ios</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\wireclub.boundary\Wireclub.Boundary\Wireclub.Boundary.iOS.fsproj">
+      <Project>{F83837F7-71B9-4EEB-85B8-276B8767DA2B}</Project>
+      <Name>Wireclub.Boundary.iOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
