@@ -76,7 +76,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <ProjectReference Include="..\..\NEXT\Wireclub.Boundary\Wireclub.Boundary.fsproj">
+    <ProjectReference Include="..\..\wireclub.boundary\Wireclub.Boundary\Wireclub.Boundary.fsproj">
       <Name>Wireclub.Boundary</Name>
       <Project>{0ccf6c2f-bdf0-40c2-a025-24bf8fd778ad}</Project>
       <Private>True</Private>
