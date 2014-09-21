@@ -19,3 +19,15 @@ let ``Fetch Bundles`` () =
     |> run
     |> assertApiResult
     |> ignore
+
+[<Test>]
+let ``AppStore Transaction`` () =
+    Credits.appStoreTransaction
+        [|
+            "",""
+            "",""
+        |]
+        ""
+    |> run
+    |> assertApiResult
+    |> ignore
