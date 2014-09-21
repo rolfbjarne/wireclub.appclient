@@ -21,6 +21,3 @@ let appStoreTransaction (data:(string * string) list) (receipt:string) =
             data |> List.map (fun (_, v) -> "values", v)
             [ "receipt", receipt ]
         ])
-
-let appStorePurchase tx receipt =
-    Api.req<CreditBundle> "api/credits/appStorePurchase" "post" [ "tx", tx ; "receipt", receipt ]
