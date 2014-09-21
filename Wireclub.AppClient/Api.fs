@@ -51,10 +51,10 @@ staticBaseUrl <- "http://192.168.0.102"
 channelServer <- "wss://192.168.0.102:8888/events"
 #endif
 #if __IOS__
-baseUrl <- "http://192.168.0.106"
-webUrl <- "http://192.168.0.106"
-staticBaseUrl <- "http://192.168.0.106"
-channelServer <- "wss://192.168.0.106:8888/events"
+baseUrl <- "http://192.168.0.103"
+webUrl <- "http://192.168.0.103"
+staticBaseUrl <- "http://192.168.0.103"
+channelServer <- "wss://192.168.0.103:8888/events"
 #endif
 #endif
 
