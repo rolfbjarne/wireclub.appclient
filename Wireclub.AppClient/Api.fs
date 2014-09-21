@@ -137,6 +137,29 @@ let req<'A> (url:string) (httpMethod:string) (data:(string*string) list)  = asyn
 let post<'A> url = req<'A> url "POST" []
 let get<'A> url = req<'A> url "GET" []
 
+let postContent<'A> (url:string) content = async {
+    try
+        let stopwatch = Stopwatch()
+        stopwatch.Start()
+
+        let url = fullUrl url
+
+        if debugSlowNetwork then
+            do! Async.Sleep (5 * 1000)
+
+        let task = client.PostAsync (url, content)
+
+        let! resp = Async.AwaitTask task
+        do! (awaitTask (resp.Content.LoadIntoBufferAsync()))
+
+        printfn "HTTP:%s %s %i %ibytes %ims" "POST" url (int resp.StatusCode) resp.Content.Headers.ContentLength.Value (stopwatch.ElapsedMilliseconds)
+
+        let! fullResponse = respParse<'A> resp  
+        return fullResponse
+    with
+    | ex -> return Exception ex
+}
+
 let upload<'A> url name filename (data:byte []) =  async {
     try
         let stopwatch = Stopwatch()
