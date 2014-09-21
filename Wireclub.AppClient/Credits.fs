@@ -12,15 +12,15 @@ open System.Net.Http
 let bundles () =
     Api.req<CreditBundles> "api/credits/bundles" "get" []
 
-let appStoreTransaction data receipt =
-    let json =
-        JsonConvert.SerializeObject 
-            {
-                AppStoreTransactionRequest.Data = data
-                AppStoreTransactionRequest.Receipt = receipt
-            }
-    let content = new StringContent(json, System.Text.Encoding.UTF8, "application/json")
-    Api.post<AppStoreTransactionResponse> "api/credits/appStoreTransaction"
+let appStoreTransaction (data:(string * string) list) (receipt:string) =
+    Api.req<AppStoreTransactionResponse>
+        "api/credits/appStoreTransaction"
+        "post"
+        (List.concat [
+            data |> List.map (fun (k, _) -> "keys", k)
+            data |> List.map (fun (_, v) -> "values", v)
+            [ "receipt", receipt ]
+        ])
 
 let appStorePurchase tx receipt =
     Api.req<CreditBundle> "api/credits/appStorePurchase" "post" [ "tx", tx ; "receipt", receipt ]

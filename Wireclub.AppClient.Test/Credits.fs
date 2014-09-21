@@ -23,10 +23,10 @@ let ``Fetch Bundles`` () =
 [<Test>]
 let ``AppStore Transaction`` () =
     Credits.appStoreTransaction
-        [|
+        [
             "",""
             "",""
-        |]
+        ]
         ""
     |> run
     |> assertApiResult
