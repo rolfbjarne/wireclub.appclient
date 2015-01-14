@@ -130,60 +130,62 @@ let (webSocket:Ref<WebSocket option>) = ref None
 let mutable cancelReconnect = new Threading.CancellationTokenSource()
 
 let init handler =
-    let init () =
-        try 
-            let client = new WebSocket(Api.channelServer, Compression = CompressionMethod.Deflate)
-            webSocket := Some client
-
-            client.OnMessage.Add (fun data -> 
-                try
-                    let event = JsonConvert.DeserializeObject data.Data :?> JArray
-                    let channel = event.[0].Value<string>()
-                    let nextSequence = event.[1].Value<int64>()
-                    let eventType = event.[2].Value<int>()
-                    let stamp = event.[3].Value<uint64>()
-                    let payload = event.[4]
-                    let user = event.[5].Value<string>()
-                    let event = deserializeEvent nextSequence eventType stamp payload user channel
-                    sequence := nextSequence
-                    handler channel event
-                with
-                | ex ->  Logger.log (ex)
-            )
-
-            printfn "[Channel] Opening websocket connection %s" Api.channelServer
-            client.Connect()
-            client.Send("auth=" + Api.userToken)
-            client.Send("seq=" + (!sequence).ToString())
-            printfn "[Channel] Connection open"
-
-            client.OnError.Add (fun e ->
-                Logger.log (new Exception(sprintf "[Channel] Websocket error: %s" e.Message))
-            )
-
-            client.OnClose.Add (fun e ->
-                Logger.log (new Exception(sprintf "[Channel] Websocket closed: %s" e.Reason))
-            )
-
-        with ex -> Logger.log (ex)
-
     cancelReconnect.Cancel()
     cancelReconnect <- new Threading.CancellationTokenSource()
     Async.Start(Timer.ticker (fun _ -> 
         lock mutex (fun _ ->
             match !webSocket with
-            | Some current when (current.ReadyState = WebSocketState.Closed) -> init ()
-            | None -> init ()
-            | _ -> ()
+            | Some current when current.ReadyState = WebSocketState.Open && current.Ping() -> ()
+            | _ -> 
+                try 
+                    let client = new WebSocket(Api.channelServer, Compression = CompressionMethod.Deflate)
+                    webSocket := Some client
+
+                    client.OnMessage.Add (fun data -> 
+                        try
+                            let event = JsonConvert.DeserializeObject data.Data :?> JArray
+                            let channel = event.[0].Value<string>()
+                            let nextSequence = event.[1].Value<int64>()
+                            let eventType = event.[2].Value<int>()
+                            let stamp = event.[3].Value<uint64>()
+                            let payload = event.[4]
+                            let user = event.[5].Value<string>()
+                            let event = deserializeEvent nextSequence eventType stamp payload user channel
+                            sequence := nextSequence
+                            handler channel event
+                        with ex ->  Logger.log (ex)
+                    )
+
+                    client.OnError.Add (fun e -> Logger.log (new Exception(String.Format("[Channel] Websocket error: {0}", e.Message))))
+                    client.OnClose.Add (fun e -> Logger.log (new Exception(String.Format("[Channel] Websocket closed: {0}", e.Reason))))
+                    client.OnOpen.Add (fun e ->
+                        printfn "[Channel] Connection authenticating"
+                        client.Send("auth=" + Api.userToken)
+                        client.Send("seq=" + (!sequence).ToString())
+                        printfn "[Channel] Connection authenticated"
+                    )
+
+                    printfn "[Channel] Opening websocket connection %s" Api.channelServer
+                    client.Connect()
+
+                with ex -> Logger.log (ex)
         )
-    ) 1000, cancelReconnect.Token)
+    ) (10 * 1000), cancelReconnect.Token)
+
+let connected () =
+    lock mutex (fun _ ->
+        match !webSocket with
+        | Some current when current.ReadyState = WebSocketState.Open -> true
+        | _ -> false
+    )
 
 let close () =
     lock mutex (fun _ ->
         match !webSocket with
         | Some current ->
             cancelReconnect.Cancel()
-            current.CloseAsync(CloseStatusCode.Normal, "Connection closed explicitly")
+            if current.ReadyState <> WebSocketState.Closing && current.ReadyState <> WebSocketState.Closed then
+                current.CloseAsync(CloseStatusCode.Normal, "Connection closed explicitly")
             webSocket := None
         | _-> ()
     )
