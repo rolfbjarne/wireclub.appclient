@@ -29,7 +29,7 @@ let ``Fetch Entity by Slug`` () =
 
 [<Test>]
 let Join () =
-    Chat.join "private_chat_lobby"
+    Chat.join "private_chat_lobby" "true"
     |> run
     |> assertApiResult
     |> printfn "%A"
