@@ -172,13 +172,6 @@ let init handler =
         )
     ) (10 * 1000), cancelReconnect.Token)
 
-let connected () =
-    lock mutex (fun _ ->
-        match !webSocket with
-        | Some current when current.ReadyState = WebSocketState.Open -> true
-        | _ -> false
-    )
-
 let close () =
     lock mutex (fun _ ->
         match !webSocket with
