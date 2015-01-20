@@ -13,7 +13,7 @@ let directory () =
     Api.req<ChatDirectoryViewModel> "chat/directory" "get" []
 
 let join slug update = async {
-        let! resp = Api.req<JoinResult> ("chat/room/" + slug + "/join") "post" [ "update", update ]
+        let! resp = Api.req<JoinResult> ("chat/room/" + slug + "/join") "post" [ "update", if update then "true" else "false" ]
         let resp =
             match resp with
             | Api.ApiOk result ->
