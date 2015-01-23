@@ -43,7 +43,7 @@ let ``Send Error`` () =
 
 [<Test>]
 let ``Session`` () =
-    PrivateChat.session "AAAAAAAAAAAAAAAB0"
+    PrivateChat.session "AAAAAAAAAAAAAAAB0" true true
     |> run
     |> assertApiResult
     |> ignore

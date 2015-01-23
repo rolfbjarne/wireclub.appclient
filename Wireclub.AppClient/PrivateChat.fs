@@ -13,8 +13,8 @@ open ChannelEvent
 let online () =
     Api.req<PrivateChatFriendsOnline> "privateChat/online" "get" []
 
-let session id = async {
-    let! resp = Api.req<SessionResponse> ("privateChat/session/" + id) "post" ["history", "true"]
+let session id history update = async {
+    let! resp = Api.req<SessionResponse> ("privateChat/session/" + id) "post" ["history", (if history then "true" else "false") ; "update", (if update then "true" else "false") ]
     return
         match resp with
         | Api.ApiOk result ->
