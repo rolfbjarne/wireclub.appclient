@@ -71,7 +71,7 @@ type HttpClientHandler () =
                     else
                         econt (new WebException(error.LocalizedDescription))
                 else
-                    let status =  enum<HttpStatusCode>(Convert.ToInt32(data.Response.StatusCode))
+                    let status =  enum<HttpStatusCode>(int data.Response.StatusCode)
                     let response =
                         new HttpResponseMessage(status,
                             Content = new StreamContent(data.ResponseBody.AsStream()),
