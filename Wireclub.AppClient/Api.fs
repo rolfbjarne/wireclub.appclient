@@ -52,10 +52,10 @@ staticBaseUrl <- "http://192.168.0.102"
 channelServer <- "wss://192.168.0.102:8888/events"
 #endif
 #if __IOS__
-baseUrl <- "http://192.168.0.107"
-webUrl <- "http://192.168.0.107"
-staticBaseUrl <- "http://192.168.0.107"
-channelServer <- "wss://192.168.0.107:8888/events"
+baseUrl <- "http://192.168.1.109"
+webUrl <- "http://192.168.1.109"
+staticBaseUrl <- "http://192.168.1.109"
+channelServer <- "ws://192.168.1.109:8888/events"
 #endif
 #endif
 
@@ -94,7 +94,8 @@ let respParse<'A> (resp:HttpResponseMessage) = async {
         try
             return ApiOk (JsonConvert.DeserializeObject<'A>(content))
         with
-        | ex -> return Deserialization (ex, content)
+        | ex ->
+            return Deserialization (ex, content)
     | 400 -> 
         let! content = stringContent ()
         try

@@ -29,7 +29,7 @@ open System
 open System.Net.Http
 open System.Threading.Tasks
 open System.Threading
-open MonoTouch.Foundation
+open Foundation
 open System.Collections.Generic
 open System.IO
 open System.Linq
@@ -71,7 +71,7 @@ type HttpClientHandler () =
                     else
                         econt (new WebException(error.LocalizedDescription))
                 else
-                    let status =  enum<HttpStatusCode>(data.Response.StatusCode)
+                    let status =  enum<HttpStatusCode>(Convert.ToInt32(data.Response.StatusCode))
                     let response =
                         new HttpResponseMessage(status,
                             Content = new StreamContent(data.ResponseBody.AsStream()),
