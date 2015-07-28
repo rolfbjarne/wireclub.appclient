@@ -48,51 +48,51 @@ type HttpClientHandler () =
     let requests = new Dictionary<NSUrlSessionTask, Request>()
     let fetchRequestByTask(task:NSUrlSessionTask) = lock requests (fun _ ->  requests.[task])
 
-    let nsUrlSessionDelegate =
-        {
-            new NSUrlSessionDataDelegate () with
-
-            override this.DidReceiveResponse(session, dataTask, response, complete) =
-                let data = fetchRequestByTask(dataTask)
-                let _, econt, _ = data.Callback
-                try
-                    data.Response <- response :?> NSHttpUrlResponse
-                with 
-                | ex -> econt ex
-
-                complete.Invoke(NSUrlSessionResponseDisposition.Allow)
-
-            override this.DidCompleteWithError (session, dataTask, error) =
-                let data = fetchRequestByTask(dataTask)
-                let cont, econt, _ = data.Callback
-                if error <> null then
-                    if error.Description.StartsWith("cancel", StringComparison.OrdinalIgnoreCase) then
-                        econt (new OperationCanceledException())
-                    else
-                        econt (new WebException(error.LocalizedDescription))
-                else
-                    let status =  enum<HttpStatusCode>(int data.Response.StatusCode)
-                    let response =
-                        new HttpResponseMessage(status,
-                            Content = new StreamContent(data.ResponseBody.AsStream()),
-                            RequestMessage = data.Request
-                        )
-
-                    for header in data.Response.AllHeaderFields do
-                        if header.Key <> null && header.Value <> null then
-                            response.Headers.TryAddWithoutValidation(header.Key.ToString(), header.Value.ToString()) |> ignore
-                            response.Content.Headers.TryAddWithoutValidation(header.Key.ToString(), header.Value.ToString()) |> ignore
-
-                    lock requests (fun _ -> requests.Remove(dataTask) |> ignore)
-
-                    cont(response)
-
-            override this.DidReceiveData (session, dataTask, byteData) =
-                let data = fetchRequestByTask(dataTask)
-                data.ResponseBody.AppendData(byteData)
-        }
-
-    let session:NSUrlSession = NSUrlSession.FromConfiguration(NSUrlSessionConfiguration.DefaultSessionConfiguration, nsUrlSessionDelegate, null)
+//    let nsUrlSessionDelegate =
+//        {
+//            new NSUrlSessionDataDelegate () with
+//
+//            override this.DidReceiveResponse(session, dataTask, response, complete) =
+//                let data = fetchRequestByTask(dataTask)
+//                let _, econt, _ = data.Callback
+//                try
+//                    data.Response <- response :?> NSHttpUrlResponse
+//                with 
+//                | ex -> econt ex
+//
+//                complete.Invoke(NSUrlSessionResponseDisposition.Allow)
+//
+//            override this.DidCompleteWithError (session, dataTask, error) =
+//                let data = fetchRequestByTask(dataTask)
+//                let cont, econt, _ = data.Callback
+//                if error <> null then
+//                    if error.Description.StartsWith("cancel", StringComparison.OrdinalIgnoreCase) then
+//                        econt (new OperationCanceledException())
+//                    else
+//                        econt (new WebException(error.LocalizedDescription))
+//                else
+//                    let status =  enum<HttpStatusCode>(int data.Response.StatusCode)
+//                    let response =
+//                        new HttpResponseMessage(status,
+//                            Content = new StreamContent(data.ResponseBody.AsStream()),
+//                            RequestMessage = data.Request
+//                        )
+//
+//                    for header in data.Response.AllHeaderFields do
+//                        if header.Key <> null && header.Value <> null then
+//                            response.Headers.TryAddWithoutValidation(header.Key.ToString(), header.Value.ToString()) |> ignore
+//                            response.Content.Headers.TryAddWithoutValidation(header.Key.ToString(), header.Value.ToString()) |> ignore
+//
+//                    lock requests (fun _ -> requests.Remove(dataTask) |> ignore)
+//
+//                    cont(response)
+//
+//            override this.DidReceiveData (session, dataTask, byteData) =
+//                let data = fetchRequestByTask(dataTask)
+//                data.ResponseBody.AppendData(byteData)
+//        }
+//
+    let session:NSUrlSession = NSUrlSession.FromConfiguration(NSUrlSessionConfiguration.DefaultSessionConfiguration, null, null)
 
     member this.ClearCookies () =
         for cookie in NSUrlSessionConfiguration.DefaultSessionConfiguration.HttpCookieStorage.Cookies do
@@ -123,7 +123,7 @@ type HttpClientHandler () =
                 )
 
             let! response = Async.FromContinuations(fun callback ->
-                let task = session.CreateDataTask(urlRequest)
+                let task = session.CreateDataTask((null : NSUrlRequest))
                 lock requests (fun _ -> requests.[task] <- new Request(Request = request, Callback = callback))
                 task.Resume();
             )
